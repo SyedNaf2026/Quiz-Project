@@ -1,0 +1,73 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Categories</h1>
+      <button class="btn btn-primary" (click)="showForm = !showForm">
+        {{ showForm ? '✕ Cancel' : '+ Add Category' }}
+      </button>
+    </div>
+
+    <!-- Add Form -->
+    @if (showForm) {
+      <div class="card p-3 mb-3">
+        <h3 class="mb-2">New Category</h3>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Category name"
+              [class.is-invalid]="form.get('name')!.invalid && form.get('name')!.touched">
+            @if (form.get('name')!.invalid && form.get('name')!.touched) {
+              <div class="invalid-feedback">Name is required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" placeholder="Optional description">
+          </div>
+          <button type="submit" class="btn btn-success">Create Category</button>
+        </form>
+      </div>
+    }
+
+    <!-- Search -->
+    <div class="form-group mb-2">
+      <input type="text" class="form-control" placeholder="🔍 Search categories..." (input)="onSearch($event)">
+    </div>
+
+    <!-- List -->
+    @if (loading) {
+      @for (i of [1,2,3]; track i) {
+        <div class="skeleton mb-2" style="height:60px; border-radius:8px"></div>
+      }
+    } @else if (filtered.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🏷️</div>
+        <p>No categories found.</p>
+      </div>
+    } @else {
+      <div class="card">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cat of filtered; track cat.id) {
+                <tr>
+                  <td>{{ cat.id }}</td>
+                  <td><strong>{{ cat.name }}</strong></td>
+                  <td class="text-muted">{{ cat.description || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

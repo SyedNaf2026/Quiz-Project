@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "W4Jr36o7jUM=",
+  "success": true,
+  "projectFilePath": "C:\\Syed\\QuizzApp Project\\Backend\\HashGen\\HashGen.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Syed.A\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

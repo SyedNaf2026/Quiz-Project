@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizApp Presentation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f1f5f9; overflow: hidden; }
+
+  .slide { display: none; width: 100vw; height: 100vh; padding: 60px 80px; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+  .slide.active { display: flex; }
+
+  /* Slide backgrounds */
+  .slide-1 { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%); }
+  .slide-2 { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+  .slide-3 { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+  .slide-4 { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+  .slide-5 { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+  .slide-6 { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+  .slide-7 { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%); }
+
+  /* Decorative circle */
+  .circle { position: absolute; border-radius: 50%; opacity: 0.08; background: #fff; }
+  .c1 { width: 400px; height: 400px; top: -100px; right: -100px; }
+  .c2 { width: 200px; height: 200px; bottom: -50px; left: -50px; }
+
+  /* Title slide */
+  .title-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 6px 18px; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-bottom: 20px; }
+  .title-main { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+  .title-main span { color: #a5b4fc; }
+  .title-sub { font-size: 1.2rem; color: #c7d2fe; margin-bottom: 40px; }
+  .title-tags { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tag { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 8px; font-size: 0.9rem; }
+
+  /* Section slides */
+  .slide-label { font-size: 0.8rem; font-weight: 600; color: #818cf8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .slide-title { font-size: 2.4rem; font-weight: 700; margin-bottom: 40px; }
+  .slide-title span { color: #818cf8; }
+
+  /* Cards grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: #e2e8f0; }
+  .card-text { font-size: 0.85rem; color: #94a3b8; line-height: 1.6; }
+
+  /* Flow chart */
+  .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .flow-box { background: rgba(99,102,241,0.2); border: 1px solid #6366f1; border-radius: 10px; padding: 14px 20px; font-size: 0.9rem; font-weight: 500; text-align: center; min-width: 120px; }
+  .flow-arrow { color: #6366f1; font-size: 1.5rem; padding: 0 8px; }
+  .flow-row { display: flex; align-items: center; gap: 0; margin-bottom: 16px; }
+
+  /* Tech stack */
+  .tech-section { margin-bottom: 28px; }
+  .tech-label { font-size: 0.8rem; color: #818cf8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600; }
+  .tech-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; }
+  .pill-blue { background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; color: #93c5fd; }
+  .pill-green { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; }
+  .pill-purple { background: rgba(139,92,246,0.2); border: 1px solid #8b5cf6; color: #c4b5fd; }
+  .pill-orange { background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fcd34d; }
+
+  /* DB table */
+  .db-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .db-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; }
+  .db-title { font-size: 0.9rem; font-weight: 700; color: #818cf8; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .db-fields { list-style: none; }
+  .db-fields li { font-size: 0.78rem; color: #94a3b8; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .db-fields li:last-child { border: none; }
+  .pk { color: #fbbf24; }
+  .fk { color: #34d399; }
+
+  /* Role flow */
+  .role-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; }
+  .role-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .role-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; color: #cbd5e1; }
+  .role-item:last-child { border: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-blue { background: #60a5fa; }
+  .dot-green { background: #34d399; }
+  .dot-purple { background: #a78bfa; }
+
+  /* Navigation */
+  .nav { position: fixed; bottom: 30px; right: 40px; display: flex; gap: 12px; z-index: 100; }
+  .nav-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+  .nav-btn:hover { background: rgba(255,255,255,0.2); }
+  .slide-counter { position: fixed; bottom: 38px; left: 40px; font-size: 0.85rem; color: #64748b; }
+
+  /* Thank you */
+  .thankyou-icon { font-size: 5rem; margin-bottom: 24px; }
+  .thankyou-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 16px; }
+  .thankyou-sub { font-size: 1.2rem; color: #c7d2fe; }
+
+  /* Features list */
+  .feat-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .feat-item { display: flex; align-items: flex-start; gap: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; }
+  .feat-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .feat-text { font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; }
+  .feat-name { font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide slide-1 active">
+  <div class="circle c1"></div>
+  <div class="circle c2"></div>
+  <div class="title-badge">🎓 Final Project</div>
+  <div class="title-main">Quiz<span>App</span></div>
+  <div class="title-sub">A full-stack interactive quiz platform with role-based access</div>
+  <div class="title-tags">
+    <div class="tag">🅰️ Angular 19</div>
+    <div class="tag">⚙️ ASP.NET Core</div>
+    <div class="tag">🗄️ SQL Server</div>
+    <div class="tag">🔐 JWT Auth</div>
+  </div>
+</div>
+
+<!-- SLIDE 2: Project Overview -->
+<div class="slide slide-2">
+  <div class="slide-label">Overview</div>
+  <div class="slide-title">What is <span>QuizApp?</span></div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">Purpose</div>
+      <div class="card-text">An online quiz platform where creators build quizzes and takers attempt them with real-time scoring.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <div class="card-title">3 User Roles</div>
+      <div class="card-text">Admin manages the platform. Quiz Creators build quizzes. Quiz Takers attempt and compete on leaderboards.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Key Highlights</div>
+      <div class="card-text">Timed quizzes, 4 question types, difficulty levels, navigator panel, leaderboard and dark mode.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: Tech Stack -->
+<div class="slide slide-3">
+  <div class="slide-label">Technologies</div>
+  <div class="slide-title">Tech <span>Stack</span></div>
+  <div class="grid-2">
+    <div>
+      <div class="tech-section">
+        <div class="tech-label">🖥️ Frontend</div>
+        <div class="tech-pills">
+          <div class="pill pill-blue">Angular 19</div>
+          <div class="pill pill-blue">TypeScript</div>
+          <div class="pill pill-blue">Reactive Forms</div>
+          <div class="pill pill-blue">RxJS</div>
+          <div class="pill pill-blue">Custom CSS</div>
+        </div>
+      </div>
+      <div class="tech-section">
+        <div class="tech-label">⚙️ Backend</div>
+        <div class="tech-pills">
+          <div class="pill pill-green">ASP.NET Core 10</div>
+          <div class="pill pill-green">C#</div>
+          <div class="pill pill-green">Entity Framework</div>
+          <div class="pill pill-green">JWT Auth</div>
+          <div class="pill pill-green">BCrypt</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="tech-section">
+        <div class="tech-label">🗄️ Database</div>
+        <div class="tech-pills">
+          <div class="pill pill-orange">SQL Server</div>
+          <div class="pill pill-orange">SSMS</div>
+          <div class="pill pill-orange">EF Migrations</div>
+        </div>
+      </div>
+      <div class="tech-section">
+        <div class="tech-label">🛠️ Tools</div>
+        <div class="tech-pills">
+          <div class="pill pill-purple">Visual Studio Code</div>
+          <div class="pill pill-purple">Swagger</div>
+          <div class="pill pill-purple">Postman</div>
+          <div class="pill pill-purple">Git</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Project Flow -->
+<div class="slide slide-4">
+  <div class="slide-label">Architecture</div>
+  <div class="slide-title">Project <span>Flow</span></div>
+  <div style="margin-bottom:28px">
+    <div class="flow-row">
+      <div class="flow-box">User</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Login / Register</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">JWT Token</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Role Check</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Dashboard</div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-box">Angular</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">HTTP Request</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">API Controller</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Service Layer</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">SQL Server</div>
+    </div>
+  </div>
+  <div class="grid-3">
+    <div class="card" style="border-color:rgba(99,102,241,0.4)">
+      <div class="card-title" style="color:#818cf8">🔐 Auth Flow</div>
+      <div class="card-text">Register → BCrypt hash → Store in DB → Login → Verify hash → Issue JWT → Navigate by role</div>
+    </div>
+    <div class="card" style="border-color:rgba(16,185,129,0.4)">
+      <div class="card-title" style="color:#34d399">📝 Quiz Flow</div>
+      <div class="card-text">Creator makes quiz → Adds questions → Taker browses → Starts timer → Submits → Score saved</div>
+    </div>
+    <div class="card" style="border-color:rgba(245,158,11,0.4)">
+      <div class="card-title" style="color:#fbbf24">🏆 Result Flow</div>
+      <div class="card-text">Submit answers → Calculate score → Save to DB → Update leaderboard → Show breakdown</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Database Structure -->
+<div class="slide slide-5">
+  <div class="slide-label">Database</div>
+  <div class="slide-title">Database <span>Structure</span></div>
+  <div class="db-grid">
+    <div class="db-card">
+      <div class="db-title">👤 Users</div>
+      <ul class="db-fields">
+        <li><span class="pk">PK</span> Id</li>
+        <li>FullName</li>
+        <li>Email</li>
+        <li>PasswordHash</li>
+        <li>Role</li>
+        <li>CreatedAt</li>
+      </ul>
+    </div>
+    <div class="db-card">
+      <div class="db-title">📂 Categories</div>
+      <ul class="db-fields">
+        <li><span class="pk">PK</span> Id</li>
+        <li>Name</li>
+        <li>Description</li>
+      </ul>
+    </div>
+    <div class="db-card">
+      <div class="db-title">📋 Quizzes</div>
+      <ul class="db-fields">
+        <li><span class="pk">PK</span> Id</li>
+        <li>Title, Description</li>
+        <li><span class="fk">FK</span> CategoryId</li>
+        <li><span class="fk">FK</span> CreatedBy</li>
+        <li>TimeLimit, Difficulty</li>
+        <li>IsActive</li>
+      </ul>
+    </div>
+    <div class="db-card">
+      <div class="db-title">❓ Questions</div>
+      <ul class="db-fields">
+        <li><span class="pk">PK</span> Id</li>
+        <li><span class="fk">FK</span> QuizId</li>
+        <li>QuestionText</li>
+        <li>QuestionType</li>
+      </ul>
+    </div>
+    <div class="db-card">
+      <div class="db-title">✅ Options</div>
+      <ul class="db-fields">
+        <li><span class="pk">PK</span> Id</li>
+        <li><span class="fk">FK</span> QuestionId</li>
+        <li>OptionText</li>
+        <li>IsCorrect</li>
+      </ul>
+    </div>
+    <div class="db-card">
+      <div class="db-title">🏆 QuizResults</div>
+      <ul class="db-fields">
+        <li><span class="pk">PK</span> Id</li>
+        <li><span class="fk">FK</span> UserId, QuizId</li>
+        <li>Score, TotalQuestions</li>
+        <li>CompletedAt</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: Features -->
+<div class="slide slide-6">
+  <div class="slide-label">Features</div>
+  <div class="slide-title">Key <span>Features</span></div>
+  <div class="feat-list">
+    <div class="feat-item">
+      <div class="feat-icon">🔐</div>
+      <div class="feat-text"><span class="feat-name">Role-Based Auth</span>JWT authentication with 3 roles — Admin, Quiz Creator, Quiz Taker</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">⏱️</div>
+      <div class="feat-text"><span class="feat-name">Timed Quizzes</span>Countdown timer with auto-submit and warnings at 30s and 10s</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🧭</div>
+      <div class="feat-text"><span class="feat-name">Question Navigator</span>Skip questions, jump between them, see answered/skipped status</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">📊</div>
+      <div class="feat-text"><span class="feat-name">4 Question Types</span>Multiple Choice, Multiple Answer, True/False, Yes/No</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🏆</div>
+      <div class="feat-text"><span class="feat-name">Leaderboard</span>Global rankings with scores across all quizzes</div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon">🌙</div>
+      <div class="feat-text"><span class="feat-name">Dark Mode</span>Full dark/light theme toggle with persistent preference</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: Thank You -->
+<div class="slide slide-7">
+  <div class="circle c1"></div>
+  <div class="circle c2"></div>
+  <div style="text-align:center">
+    <div class="thankyou-icon">🧠</div>
+    <div class="thankyou-title">Thank You</div>
+    <div class="thankyou-sub">QuizApp — Built with Angular 19 + ASP.NET Core + SQL Server</div>
+    <div style="margin-top:40px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <div class="tag">🌐 localhost:4200</div>
+      <div class="tag">⚙️ localhost:7220</div>
+      <div class="tag">🗄️ dbQuizzApp</div>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="slide-counter" id="counter">1 / 7</div>
+<div class="nav">
+  <button class="nav-btn" onclick="prev()">← Prev</button>
+  <button class="nav-btn" onclick="next()">Next →</button>
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+
+  function show(n) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+  }
+
+  function next() { show(current + 1); }
+  function prev() { show(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+  });
+</script>
+</body>
+</html>

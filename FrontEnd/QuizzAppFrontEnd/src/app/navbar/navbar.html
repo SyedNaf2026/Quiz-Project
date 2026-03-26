@@ -1,0 +1,43 @@
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="nav-logo">🧠</span>
+    <span class="nav-title">QuizApp</span>
+  </div>
+
+  <button class="nav-toggle" (click)="menuOpen = !menuOpen" aria-label="Toggle menu">☰</button>
+
+  <div class="nav-links" [class.open]="menuOpen">
+
+    <!-- Admin -->
+    @if (isAdmin()) {
+      <a routerLink="/admin/dashboard" routerLinkActive="active" (click)="menuOpen=false">Dashboard</a>
+      <a routerLink="/admin/users" routerLinkActive="active" (click)="menuOpen=false">Users</a>
+      <a routerLink="/admin/categories" routerLinkActive="active" (click)="menuOpen=false">Categories</a>
+    }
+
+    <!-- Creator -->
+    @if (isCreator()) {
+      <a routerLink="/home" routerLinkActive="active" (click)="menuOpen=false">Home</a>
+      <a routerLink="/creator/my-quizzes" routerLinkActive="active" (click)="menuOpen=false">My Quizzes</a>
+      <a routerLink="/creator/create-quiz" routerLinkActive="active" (click)="menuOpen=false">Create Quiz</a>
+    }
+
+    <!-- Taker -->
+    @if (isTaker()) {
+      <a routerLink="/home" routerLinkActive="active" (click)="menuOpen=false">Home</a>
+      <a routerLink="/taker/browse" routerLinkActive="active" (click)="menuOpen=false">Browse Quizzes</a>
+      <a routerLink="/taker/results" routerLinkActive="active" (click)="menuOpen=false">My Results</a>
+      <a routerLink="/taker/leaderboard" routerLinkActive="active" (click)="menuOpen=false">Leaderboard</a>
+    }
+
+    <a routerLink="/profile" routerLinkActive="active" (click)="menuOpen=false">Profile</a>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn-icon" (click)="toggleTheme()" [title]="isDark ? 'Light mode' : 'Dark mode'">
+      {{ isDark ? '☀️' : '🌙' }}
+    </button>
+    <span class="nav-user">{{ userName }}</span>
+    <button class="btn btn-sm btn-outline" (click)="logout()">Logout</button>
+  </div>
+</nav>

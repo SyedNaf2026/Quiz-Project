@@ -1,0 +1,58 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">My Quizzes</h1>
+      <a routerLink="/creator/create-quiz" class="btn btn-primary">+ Create Quiz</a>
+    </div>
+
+    @if (loading) {
+      <div class="grid grid-2">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton" style="height:160px; border-radius:8px"></div>
+        }
+      </div>
+    } @else if (quizzes.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <p>You haven't created any quizzes yet.</p>
+        <a routerLink="/creator/create-quiz" class="btn btn-primary mt-2">Create your first quiz</a>
+      </div>
+    } @else {
+      <div class="grid grid-2">
+        @for (quiz of quizzes; track quiz.id) {
+          <div class="quiz-card">
+            <div class="d-flex justify-between align-center">
+              <h3 class="quiz-card-title">{{ quiz.title }}</h3>
+              <span class="badge" [class]="quiz.isActive ? 'badge-success' : 'badge-danger'">
+                {{ quiz.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+            <p class="text-muted fs-sm">{{ quiz.description }}</p>
+            <div class="quiz-card-meta">
+              <span>🏷️ {{ quiz.categoryName }}</span>
+              <span>❓ {{ quiz.totalQuestions }} questions</span>
+              @if (quiz.timeLimit) { <span>⏱️ {{ quiz.timeLimit }} min</span> }
+            </div>
+            <div class="quiz-card-actions">
+              <a [routerLink]="['/creator/quiz', quiz.id, 'questions']" class="btn btn-sm btn-info">Questions</a>
+              <a [routerLink]="['/creator/edit-quiz', quiz.id]" class="btn btn-sm btn-warning">Edit</a>
+              <button class="btn btn-sm btn-outline" (click)="toggle(quiz)">
+                {{ quiz.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="confirmDelete(quiz)">Delete</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<app-confirm-dialog
+  [visible]="showConfirm"
+  title="Delete Quiz"
+  [message]="'Delete &quot;' + (selectedQuiz?.title || '') + '&quot;? This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirm)="doDelete()"
+  (cancel)="showConfirm = false" />

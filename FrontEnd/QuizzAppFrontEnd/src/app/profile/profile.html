@@ -1,0 +1,132 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">My Profile</h1>
+    </div>
+
+    @if (loading) {
+      <div class="grid grid-2">
+        <div class="skeleton" style="height:200px;border-radius:8px"></div>
+        <div class="skeleton" style="height:200px;border-radius:8px"></div>
+      </div>
+    } @else {
+
+      <!-- Top row: Profile info + Edit form side by side -->
+      <div class="grid grid-2 mb-2" style="align-items:start">
+
+        <!-- Left: Profile Info -->
+        <div class="card p-3">
+          <div class="d-flex align-center gap-2 mb-3">
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--primary);
+                        display:flex;align-items:center;justify-content:center;
+                        color:#fff;font-size:1.75rem;font-weight:700;flex-shrink:0">
+              {{ form.value.fullName?.charAt(0)?.toUpperCase() || '?' }}
+            </div>
+            <div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text)">{{ form.value.fullName }}</div>
+              <div style="color:var(--text-muted);font-size:0.875rem">{{ form.value.email }}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <div class="profile-detail-box">
+              <div class="profile-detail-label">Full Name</div>
+              <div class="profile-detail-value">{{ form.value.fullName }}</div>
+            </div>
+            <div class="profile-detail-box">
+              <div class="profile-detail-label">Email</div>
+              <div class="profile-detail-value">{{ form.value.email }}</div>
+            </div>
+            <div class="profile-detail-box">
+              <div class="profile-detail-label">Role</div>
+              <div class="profile-detail-value">
+                <span class="badge"
+                  [class]="role === 'QuizCreator' ? 'badge-info' : role === 'Admin' ? 'badge-danger' : 'badge-success'">
+                  {{ role === 'QuizCreator' ? '🛠️ Quiz Creator' : role === 'QuizTaker' ? '🎯 Quiz Taker' : '👑 Admin' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Edit Form -->
+        <div class="card p-3">
+          <h3 style="color:var(--text);font-size:1rem;font-weight:600;margin-bottom:1rem">✏️ Edit Details</h3>
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" formControlName="fullName"
+                [class.is-invalid]="form.get('fullName')!.invalid && form.get('fullName')!.touched">
+              @if (form.get('fullName')!.invalid && form.get('fullName')!.touched) {
+                <div class="invalid-feedback">Full name is required.</div>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" formControlName="email"
+                [class.is-invalid]="form.get('email')!.invalid && form.get('email')!.touched">
+              @if (form.get('email')!.invalid && form.get('email')!.touched) {
+                <div class="invalid-feedback">Valid email is required.</div>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <input type="text" class="form-control" [value]="role" disabled
+                style="opacity:1;cursor:not-allowed;background:var(--bg);color:var(--text);border-color:var(--border)">
+              <small style="color:var(--text-muted);font-size:0.8rem">Role cannot be changed.</small>
+            </div>
+            <button type="submit" class="btn btn-primary" [disabled]="saving">
+              @if (saving) { <span class="btn-spinner"></span> }
+              {{ saving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Stats Section (QuizTaker only) -->
+      @if (role === 'QuizTaker' && stats) {
+        <div class="card p-3">
+          <h3 style="color:var(--text);font-size:1rem;font-weight:600;margin-bottom:1rem">📊 My Stats</h3>
+          <div class="grid grid-3" style="gap:1rem">
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(79,70,229,0.1)">🎯</div>
+              <div class="stat-info">
+                <div class="stat-value" style="color:var(--text)">{{ stats.totalAttempts }}</div>
+                <div class="stat-label">Total Attempts</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(79,70,229,0.1)">📋</div>
+              <div class="stat-info">
+                <div class="stat-value" style="color:var(--text)">{{ stats.totalQuizzesTaken }}</div>
+                <div class="stat-label">Quizzes Taken</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(16,185,129,0.1)">📈</div>
+              <div class="stat-info">
+                <div class="stat-value" style="color:var(--text)">{{ stats.averageScore | number:'1.0-1' }}%</div>
+                <div class="stat-label">Avg Score</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(245,158,11,0.1)">🏆</div>
+              <div class="stat-info">
+                <div class="stat-value" style="color:var(--text)">{{ stats.bestScore | number:'1.0-1' }}%</div>
+                <div class="stat-label">Best Score</div>
+              </div>
+            </div>
+            <div class="stat-card" style="grid-column:span 2">
+              <div class="stat-icon" style="background:rgba(59,130,246,0.1)">⭐</div>
+              <div class="stat-info">
+                <div class="stat-value" style="font-size:1.2rem;color:var(--text)">{{ stats.bestCategory }}</div>
+                <div class="stat-label">Best Category</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+    }
+  </div>
+</div>

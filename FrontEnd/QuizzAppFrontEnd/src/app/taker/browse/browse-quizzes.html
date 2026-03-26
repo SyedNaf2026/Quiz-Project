@@ -1,0 +1,85 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Browse Quizzes</h1>
+    </div>
+
+    <!-- Filters -->
+    <div class="d-flex gap-1 flex-wrap mb-3">
+      <input type="text" class="form-control" style="max-width:280px"
+        placeholder="🔍 Search quizzes..." (input)="onSearch($event)">
+      <select class="form-control" style="max-width:200px" (change)="onCategoryFilter($event)">
+        <option value="">All Categories</option>
+        @for (cat of categories; track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+      <select class="form-control" style="max-width:160px" (change)="onDifficultyFilter($event)">
+        <option value="">All Difficulties</option>
+        @for (d of availableDifficulties; track d) {
+          <option [value]="d">
+            {{ d === 'Easy' ? '🟢' : d === 'Medium' ? '🟡' : '🔴' }} {{ d }}
+          </option>
+        }
+      </select>
+    </div>
+
+    @if (loading) {
+      <div class="grid grid-2">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton" style="height:180px; border-radius:8px"></div>
+        }
+      </div>
+    } @else if (filtered.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <p>No quizzes found.</p>
+      </div>
+    } @else {
+      <!-- Pagination info -->
+      <p class="text-muted fs-sm mb-2">Showing {{ pageStart }}–{{ pageEnd }} of {{ filtered.length }} quizzes</p>
+
+      <div class="grid grid-2">
+        @for (quiz of paged; track quiz.id) {
+          <div class="quiz-card">
+            <div class="d-flex justify-between align-center">
+              <h3 class="quiz-card-title">{{ quiz.title }}</h3>
+              <div class="d-flex gap-1 align-center">
+                @if (quiz.difficulty) {
+                  <span class="badge"
+                    [class]="quiz.difficulty === 'Easy' ? 'badge-success' : quiz.difficulty === 'Hard' ? 'badge-danger' : 'badge-warning'">
+                    {{ quiz.difficulty }}
+                  </span>
+                }
+                @if (quiz.timeLimit) {
+                  <span class="badge badge-info">⏱️ {{ quiz.timeLimit }}m</span>
+                }
+              </div>
+            </div>
+            <p class="text-muted fs-sm">{{ quiz.description }}</p>
+            <div class="quiz-card-meta">
+              <span>🏷️ {{ quiz.categoryName }}</span>
+              <span>❓ {{ quiz.totalQuestions }} questions</span>
+              <span>👤 {{ quiz.creatorName }}</span>
+            </div>
+            <div class="quiz-card-actions">
+              <a [routerLink]="['/taker/take', quiz.id]" class="btn btn-primary btn-sm">Start Quiz</a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="d-flex justify-center gap-1 mt-3">
+          <button class="btn btn-outline btn-sm" [disabled]="page === 1" (click)="page = page - 1; updatePage()">← Prev</button>
+          @for (p of pages; track p) {
+            <button class="btn btn-sm" [class]="p === page ? 'btn-primary' : 'btn-outline'" (click)="page = p; updatePage()">{{ p }}</button>
+          }
+          <button class="btn btn-outline btn-sm" [disabled]="page === totalPages" (click)="page = page + 1; updatePage()">Next →</button>
+        </div>
+      }
+    }
+  </div>
+</div>

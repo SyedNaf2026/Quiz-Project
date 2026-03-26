@@ -1,0 +1,54 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Users Overview</h1>
+    </div>
+
+    <div class="card">
+      @if (loading) {
+        <div class="p-3">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="skeleton mb-2" style="height:48px; border-radius:6px"></div>
+          }
+        </div>
+      } @else if (entries.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">👥</div>
+          <p>No user activity yet.</p>
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Quiz</th>
+                <th>Score</th>
+                <th>%</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of entries; track e.rank) {
+                <tr>
+                  <td><span class="badge badge-info">#{{ e.rank }}</span></td>
+                  <td><strong>{{ e.userName }}</strong></td>
+                  <td>{{ e.quizTitle }}</td>
+                  <td>{{ e.score }}/{{ e.totalQuestions }}</td>
+                  <td>
+                    <span class="badge" [class]="e.percentage >= 70 ? 'badge-success' : e.percentage >= 40 ? 'badge-warning' : 'badge-danger'">
+                      {{ e.percentage | number:'1.0-0' }}%
+                    </span>
+                  </td>
+                  <td class="text-muted fs-sm">{{ e.completedAt | date:'short' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,131 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+
+    <!-- Hero / Welcome -->
+    <div class="home-hero card p-3 mb-3" style="text-align:center">
+      <div style="font-size:3.5rem;margin-bottom:0.5rem">🧠</div>
+      <h1 style="color:var(--text);font-size:2rem;margin-bottom:0.25rem">
+        Welcome back, {{ userName }}!
+      </h1>
+      <p style="color:var(--text-muted);font-size:1rem;margin-bottom:1.5rem">
+        {{ isCreator ? 'Ready to create something amazing today?' : 'Ready to test your knowledge today?' }}
+      </p>
+      <div class="d-flex gap-1 justify-center flex-wrap">
+        @if (isCreator) {
+          <a routerLink="/creator/my-quizzes" class="btn btn-primary btn-lg">📋 My Quizzes</a>
+          <a routerLink="/creator/create-quiz" class="btn btn-success btn-lg">➕ Create Quiz</a>
+        }
+        @if (isTaker) {
+          <a routerLink="/taker/browse" class="btn btn-primary btn-lg">🔍 Browse Quizzes</a>
+          <a routerLink="/taker/results" class="btn btn-outline btn-lg">📊 My Results</a>
+          <a routerLink="/taker/leaderboard" class="btn btn-outline btn-lg">🏆 Leaderboard</a>
+        }
+      </div>
+    </div>
+
+    <!-- Rotating Quote -->
+    <div class="quote-card card p-3 mb-3" style="text-align:center;border-left:4px solid var(--primary)">
+      <div style="font-size:2rem;margin-bottom:0.5rem">💬</div>
+      <p class="quote-text" style="font-size:1.1rem;font-style:italic;color:var(--text);margin-bottom:0.5rem">
+        "{{ quote.text }}"
+      </p>
+      <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1rem">— {{ quote.author }}</p>
+      <button class="btn btn-outline btn-sm" (click)="nextQuote()">🔄 Next Quote</button>
+    </div>
+
+    <!-- What's New -->
+    <div class="mb-3">
+      <h2 style="color:var(--text);margin-bottom:1rem;font-size:1.3rem">🚀 What's New</h2>
+      <div class="grid grid-3">
+        @for (f of features; track f.title) {
+          <div class="card p-2" style="display:flex;flex-direction:column;gap:0.5rem">
+            <div style="font-size:2rem">{{ f.icon }}</div>
+            <h4 style="color:var(--text);font-size:0.95rem;font-weight:600">{{ f.title }}</h4>
+            <p style="color:var(--text-muted);font-size:0.825rem;margin:0">{{ f.desc }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="card p-3 mb-3">
+      <h2 style="color:var(--text);margin-bottom:1.25rem;font-size:1.3rem">
+        {{ isCreator ? '🛠️ How to Create a Quiz' : '🎯 How to Take a Quiz' }}
+      </h2>
+      <div class="d-flex gap-2 flex-wrap">
+        @if (isCreator) {
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div>
+              <p class="fw-bold" style="color:var(--text);margin-bottom:0.2rem">Create a Quiz</p>
+              <p style="color:var(--text-muted);font-size:0.825rem;margin:0">Go to Create Quiz, fill in title, category and difficulty.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div>
+              <p class="fw-bold" style="color:var(--text);margin-bottom:0.2rem">Add Questions</p>
+              <p style="color:var(--text-muted);font-size:0.825rem;margin:0">Open your quiz and add questions with 4 options each.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div>
+              <p class="fw-bold" style="color:var(--text);margin-bottom:0.2rem">Publish</p>
+              <p style="color:var(--text-muted);font-size:0.825rem;margin:0">Set the quiz to Active so takers can find and attempt it.</p>
+            </div>
+          </div>
+        }
+        @if (isTaker) {
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div>
+              <p class="fw-bold" style="color:var(--text);margin-bottom:0.2rem">Browse Quizzes</p>
+              <p style="color:var(--text-muted);font-size:0.825rem;margin:0">Filter by category or difficulty to find the right quiz.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div>
+              <p class="fw-bold" style="color:var(--text);margin-bottom:0.2rem">Confirm & Start</p>
+              <p style="color:var(--text-muted);font-size:0.825rem;margin:0">Review quiz details, then click Start Quiz to begin the timer.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div>
+              <p class="fw-bold" style="color:var(--text);margin-bottom:0.2rem">Submit & Review</p>
+              <p style="color:var(--text-muted);font-size:0.825rem;margin:0">Submit your answers and see instant feedback with your score.</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- FAQ — only for QuizTakers -->
+    @if (!isCreator) {
+    <div class="mb-3">
+      <h2 style="color:var(--text);margin-bottom:1rem;font-size:1.3rem">❓ Frequently Asked Questions</h2>
+      @for (faq of faqs; track faq.q; let i = $index) {
+        <div class="faq-item card mb-1">
+          <button class="faq-question" (click)="toggleFaq(i)"
+            style="width:100%;display:flex;justify-content:space-between;align-items:center;
+                   padding:0.875rem 1.25rem;background:none;border:none;cursor:pointer;text-align:left">
+            <span style="color:var(--text);font-weight:600;font-size:0.9rem">{{ faq.q }}</span>
+            <span style="color:var(--primary);font-size:1.1rem;transition:transform 0.2s"
+              [style.transform]="openFaq === i ? 'rotate(180deg)' : 'rotate(0)'">▼</span>
+          </button>
+          @if (openFaq === i) {
+            <div style="padding:0 1.25rem 0.875rem;color:var(--text-muted);font-size:0.875rem;
+                        border-top:1px solid var(--border)">
+              {{ faq.a }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+    }
+
+  </div>
+</div>

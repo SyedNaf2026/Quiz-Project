@@ -1,0 +1,97 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">🧠</div>
+      <h1 class="auth-title">QuizApp</h1>
+      <p class="auth-subtitle">Sign in to your account</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" formControlName="email"
+          placeholder="you@example.com"
+          [class.is-invalid]="f['email'].invalid && f['email'].touched">
+        @if (f['email'].invalid && f['email'].touched) {
+          <div class="invalid-feedback">Valid email is required.</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password"
+            placeholder="••••••••"
+            [class.is-invalid]="f['password'].invalid && f['password'].touched">
+          <button type="button" class="input-addon" (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (f['password'].invalid && f['password'].touched) {
+          <div class="invalid-feedback">Password is required.</div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 btn-lg" [disabled]="loading">
+        @if (loading) { <span class="btn-spinner"></span> }
+        {{ loading ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:0.75rem">
+      <button type="button" class="btn btn-outline btn-sm" (click)="showForgot = true; resetForgot()">
+        Forgot Password?
+      </button>
+    </div>
+
+    <p class="auth-footer">
+      Don't have an account? <a routerLink="/register">Register</a>
+    </p>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+@if (showForgot) {
+  <div class="modal-backdrop" (click)="showForgot = false; resetForgot()">
+    <div class="modal-box" style="max-width:420px" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">🔑 Reset Password</span>
+        <button class="modal-close" (click)="showForgot = false; resetForgot()">✕</button>
+      </div>
+
+      <p class="text-muted fs-sm mb-2">Enter your registered email and choose a new password.</p>
+
+      @if (forgotError) {
+        <div style="background:#fee2e2;color:#991b1b;padding:0.6rem 0.875rem;border-radius:6px;font-size:0.85rem;margin-bottom:1rem">
+          ⚠️ {{ forgotError }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" [(ngModel)]="forgotEmail"
+          [ngModelOptions]="{standalone: true}" placeholder="your@email.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input type="password" class="form-control" [(ngModel)]="forgotNewPassword"
+          [ngModelOptions]="{standalone: true}" placeholder="Min 6 characters">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" class="form-control" [(ngModel)]="forgotConfirm"
+          [ngModelOptions]="{standalone: true}" placeholder="Repeat new password">
+      </div>
+
+      <div class="d-flex gap-1 justify-center mt-2">
+        <button class="btn btn-primary" (click)="submitForgot()" [disabled]="forgotLoading">
+          @if (forgotLoading) { <span class="btn-spinner"></span> }
+          Reset Password
+        </button>
+        <button class="btn btn-outline" (click)="showForgot = false; resetForgot()">Cancel</button>
+      </div>
+    </div>
+  </div>
+}

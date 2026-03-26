@@ -1,0 +1,63 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">🧠</div>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle">Join QuizApp today</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-control" formControlName="fullName"
+          placeholder="Your full name"
+          [class.is-invalid]="f['fullName'].invalid && f['fullName'].touched">
+        @if (f['fullName'].invalid && f['fullName'].touched) {
+          <div class="invalid-feedback">Full name is required (min 2 chars).</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" formControlName="email"
+          placeholder="you@example.com"
+          [class.is-invalid]="f['email'].invalid && f['email'].touched">
+        @if (f['email'].invalid && f['email'].touched) {
+          <div class="invalid-feedback">Valid email is required.</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password"
+            placeholder="Min 6 characters"
+            [class.is-invalid]="f['password'].invalid && f['password'].touched">
+          <button type="button" class="input-addon" (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (f['password'].invalid && f['password'].touched) {
+          <div class="invalid-feedback">Password must be at least 6 characters.</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">I want to</label>
+        <select class="form-control" formControlName="role">
+          <option value="QuizTaker">Take Quizzes</option>
+          <option value="QuizCreator">Create Quizzes</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 btn-lg" [disabled]="loading">
+        @if (loading) { <span class="btn-spinner"></span> }
+        {{ loading ? 'Creating account...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>
