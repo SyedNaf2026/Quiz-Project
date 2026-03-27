@@ -2988,11 +2988,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Syed\\QuizzApp Project\\Backend\\QuizzApp.Tests\\QuizzApp.Tests.csproj",
+      "projectUniqueName": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\QuizzApp.Tests.csproj",
       "projectName": "QuizzApp.Tests",
-      "projectPath": "C:\\Syed\\QuizzApp Project\\Backend\\QuizzApp.Tests\\QuizzApp.Tests.csproj",
+      "projectPath": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\QuizzApp.Tests.csproj",
       "packagesPath": "C:\\Users\\Syed.A\\.nuget\\packages\\",
-      "outputPath": "C:\\Syed\\QuizzApp Project\\Backend\\QuizzApp.Tests\\obj\\",
+      "outputPath": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3013,8 +3013,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Syed\\QuizzApp Project\\Backend\\QuizzApp\\QuizzApp.csproj": {
-              "projectPath": "C:\\Syed\\QuizzApp Project\\Backend\\QuizzApp\\QuizzApp.csproj"
+            "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\QuizzApp.csproj": {
+              "projectPath": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\QuizzApp.csproj"
             }
           }
         }

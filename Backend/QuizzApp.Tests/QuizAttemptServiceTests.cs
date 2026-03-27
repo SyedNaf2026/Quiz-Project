@@ -14,12 +14,20 @@ namespace QuizzApp.Tests
         private readonly Mock<IGenericRepository<QuizResult>> _resultRepoMock;
         private readonly Mock<IGenericRepository<UserAnswer>> _answerRepoMock;
         private readonly Mock<IGenericRepository<Quiz>> _quizRepoMock;
+        private readonly Mock<INotificationService> _notifMock;
 
         public QuizAttemptServiceTests()
         {
             _resultRepoMock = new Mock<IGenericRepository<QuizResult>>();
             _answerRepoMock = new Mock<IGenericRepository<UserAnswer>>();
             _quizRepoMock   = new Mock<IGenericRepository<Quiz>>();
+            _notifMock      = new Mock<INotificationService>();
+
+            // Notification calls are fire-and-forget in tests — just complete
+            _notifMock.Setup(n => n.SendToAllTakersAsync(It.IsAny<string>(), It.IsAny<string>()))
+                      .Returns(Task.CompletedTask);
+            _notifMock.Setup(n => n.SendToUserAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                      .Returns(Task.CompletedTask);
         }
 
         private AppDbContext CreateDb(string name)
@@ -31,7 +39,7 @@ namespace QuizzApp.Tests
         }
 
         private QuizAttemptService CreateService(AppDbContext db) =>
-            new QuizAttemptService(_quizRepoMock.Object, _resultRepoMock.Object, _answerRepoMock.Object, db);
+            new QuizAttemptService(_quizRepoMock.Object, _resultRepoMock.Object, _answerRepoMock.Object, db, _notifMock.Object);
 
         // Helper: seeds a quiz with questions and options into the InMemory DB
         private async Task SeedQuiz(AppDbContext db, bool isActive = true)

@@ -12,17 +12,20 @@ namespace QuizzApp.Services
         private readonly IGenericRepository<QuizResult> _resultRepo;
         private readonly IGenericRepository<UserAnswer> _answerRepo;
         private readonly AppDbContext _context;
+        private readonly INotificationService _notificationService;
 
         public QuizAttemptService(
             IGenericRepository<Quiz> quizRepo,
             IGenericRepository<QuizResult> resultRepo,
             IGenericRepository<UserAnswer> answerRepo,
-            AppDbContext context)
+            AppDbContext context,
+            INotificationService notificationService)
         {
             _quizRepo = quizRepo;
             _resultRepo = resultRepo;
             _answerRepo = answerRepo;
             _context = context;
+            _notificationService = notificationService;
         }
 
         public async Task<(bool Success, string Message, QuizResultDTO? Data)> SubmitQuizAsync(SubmitQuizDTO dto, int userId)
@@ -130,6 +133,45 @@ namespace QuizzApp.Services
                 CompletedAt = DateTime.UtcNow
             };
             await _resultRepo.AddAsync(quizResult);
+
+            // ── Leaderboard notification logic ──────────────────────────
+            // Get the overall leaderboard BEFORE this result was saved to find previous #1
+            // We compare by looking at all results excluding the one just saved
+            var previousTop = await _context.QuizResults
+                .Include(r => r.User)
+                .Where(r => !(r.UserId == userId && r.QuizId == dto.QuizId))
+                .OrderByDescending(r => r.Percentage)
+                .ThenByDescending(r => r.Score)
+                .FirstOrDefaultAsync();
+
+            // Get new #1 after save
+            var newTop = await _context.QuizResults
+                .Include(r => r.User)
+                .OrderByDescending(r => r.Percentage)
+                .ThenByDescending(r => r.Score)
+                .FirstOrDefaultAsync();
+
+            bool leaderboardChanged = newTop != null &&
+                (previousTop == null || newTop.UserId != previousTop.UserId);
+
+            if (leaderboardChanged && newTop != null)
+            {
+                string newTopName = newTop.User?.FullName ?? "Someone";
+
+                // Notify all QuizTakers about the leaderboard change
+                await _notificationService.SendToAllTakersAsync(
+                    $"🏆 Leaderboard updated! {newTopName} is now #1!", "leaderboard_update");
+
+                // Notify the displaced #1 specifically
+                if (previousTop != null && previousTop.UserId != newTop.UserId)
+                {
+                    await _notificationService.SendToUserAsync(
+                        previousTop.UserId,
+                        $"You've been overtaken! {newTopName} is now #1 on the leaderboard.",
+                        "rank_lost");
+                }
+            }
+            // ────────────────────────────────────────────────────────────
 
             return (true, "Quiz submitted successfully.", new QuizResultDTO
             {

@@ -90,6 +90,42 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "QuizzApp.Controllers.NotificationController",
+    "Method": "GetMyNotifications",
+    "RelativePath": "api/Notification",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.NotificationController",
+    "Method": "MarkRead",
+    "RelativePath": "api/Notification/{id}/read",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.NotificationController",
+    "Method": "MarkAllRead",
+    "RelativePath": "api/Notification/read-all",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "QuizzApp.Controllers.QuestionController",
     "Method": "AddQuestion",
     "RelativePath": "api/Question",

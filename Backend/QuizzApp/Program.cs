@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
 using QuizzApp.Context;
+using QuizzApp.Hubs;
 using QuizzApp.Interfaces;
 using QuizzApp.Middleware;
 using QuizzApp.Repository;
@@ -40,6 +41,10 @@ namespace QuizzApp
             builder.Services.AddScoped<IQuestionService, QuestionService>();
             builder.Services.AddScoped<IQuizAttemptService, QuizAttemptService>();
             builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+
+            // SignalR for real-time notifications
+            builder.Services.AddSignalR();
             // ============================================================
             // 4. JWT SETTINGS (Prepared for later use)
             // ============================================================
@@ -80,7 +85,8 @@ namespace QuizzApp
                     {
                         policy.WithOrigins("http://localhost:4200")
                               .AllowAnyHeader()
-                              .AllowAnyMethod();
+                              .AllowAnyMethod()
+                              .AllowCredentials(); // Required for SignalR
                     });
             });
 
@@ -142,6 +148,9 @@ namespace QuizzApp
 
             // Map Controllers
             app.MapControllers();
+
+            // Map SignalR hub
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.Run();
         }

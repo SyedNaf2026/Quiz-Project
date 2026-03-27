@@ -13,11 +13,19 @@ namespace QuizzApp.Tests
     {
         private readonly Mock<IGenericRepository<Quiz>> _quizRepoMock;
         private readonly Mock<IGenericRepository<Category>> _categoryRepoMock;
+        private readonly Mock<INotificationService> _notifMock;
 
         public QuizServiceTests()
         {
             _quizRepoMock     = new Mock<IGenericRepository<Quiz>>();
             _categoryRepoMock = new Mock<IGenericRepository<Category>>();
+            _notifMock        = new Mock<INotificationService>();
+
+            // Notification calls are fire-and-forget in tests — just complete
+            _notifMock.Setup(n => n.SendToAllTakersAsync(It.IsAny<string>(), It.IsAny<string>()))
+                      .Returns(Task.CompletedTask);
+            _notifMock.Setup(n => n.SendToUserAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                      .Returns(Task.CompletedTask);
         }
 
         private AppDbContext CreateDb(string name)
@@ -29,7 +37,7 @@ namespace QuizzApp.Tests
         }
 
         private QuizService CreateService(AppDbContext db) =>
-            new QuizService(_quizRepoMock.Object, _categoryRepoMock.Object, db);
+            new QuizService(_quizRepoMock.Object, _categoryRepoMock.Object, db, _notifMock.Object);
 
         // ── CreateQuiz Tests ────────────────────────────────────
 

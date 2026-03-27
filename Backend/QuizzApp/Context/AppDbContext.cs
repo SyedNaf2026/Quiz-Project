@@ -19,6 +19,7 @@ namespace QuizzApp.Context
         public DbSet<Option> Options { get; set; }
         public DbSet<QuizResult> QuizResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         // OnModelCreating is used to configure relationships and constraints
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -102,6 +103,19 @@ namespace QuizzApp.Context
                     .WithMany(q => q.UserAnswers)
                     .HasForeignKey(ua => ua.QuestionId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.Property(n => n.Message).IsRequired().HasMaxLength(500);
+                entity.Property(n => n.Type).IsRequired().HasMaxLength(50);
+
+                // UserId is nullable (null = broadcast)
+                entity.HasOne(n => n.User)
+                    .WithMany()
+                    .HasForeignKey(n => n.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired(false);
             });
         }
     }

@@ -12,15 +12,18 @@ namespace QuizzApp.Services
         private readonly IGenericRepository<Quiz> _quizRepo;
         private readonly IGenericRepository<Category> _categoryRepo;
         private readonly AppDbContext _context;
+        private readonly INotificationService _notificationService;
 
         public QuizService(
             IGenericRepository<Quiz> quizRepo,
             IGenericRepository<Category> categoryRepo,
-            AppDbContext context)
+            AppDbContext context,
+            INotificationService notificationService)
         {
             _quizRepo = quizRepo;
             _categoryRepo = categoryRepo;
             _context = context;
+            _notificationService = notificationService;
         }
 
         public async Task<(bool Success, string Message, QuizDTO? Data)> CreateQuizAsync(CreateQuizDTO dto, int creatorId)
@@ -42,6 +45,10 @@ namespace QuizzApp.Services
             };
 
             await _quizRepo.AddAsync(quiz);
+
+            // Notify all QuizTakers about the new quiz
+            await _notificationService.SendToAllTakersAsync(
+                $"New quiz available: \"{quiz.Title}\"", "quiz_added");
 
             var result = new QuizDTO
             {
@@ -78,6 +85,11 @@ namespace QuizzApp.Services
             quiz.Difficulty = dto.Difficulty;
 
             await _quizRepo.UpdateAsync(quiz);
+
+            // Notify all QuizTakers about the quiz update
+            await _notificationService.SendToAllTakersAsync(
+                $"Quiz \"{quiz.Title}\" has been updated.", "quiz_updated");
+
             return (true, "Quiz updated successfully.");
         }
 
@@ -101,6 +113,14 @@ namespace QuizzApp.Services
             await _quizRepo.UpdateAsync(quiz);
 
             string status = quiz.IsActive ? "activated" : "deactivated";
+
+            // Notify all QuizTakers when a quiz is deactivated
+            if (!quiz.IsActive)
+            {
+                await _notificationService.SendToAllTakersAsync(
+                    $"Quiz \"{quiz.Title}\" has been deactivated.", "quiz_deactivated");
+            }
+
             return (true, $"Quiz {status} successfully.");
         }
 

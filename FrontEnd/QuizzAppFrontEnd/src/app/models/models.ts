@@ -167,3 +167,12 @@ export interface UpdateProfileDTO {
   fullName: string;
   email: string;
 }
+
+// ===== Notifications =====
+export interface NotificationDTO {
+  id: number;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+}
