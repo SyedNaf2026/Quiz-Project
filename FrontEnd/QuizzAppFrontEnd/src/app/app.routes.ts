@@ -54,6 +54,18 @@ export const routes: Routes = [
     ]
   },
 
+  // Group Manager routes
+  {
+    path: 'group-manager',
+    canActivate: [authGuard, roleGuard(['GroupManager'])],
+    children: [
+      { path: 'dashboard', loadComponent: () => import('./group-manager/dashboard/gm-dashboard').then(m => m.GmDashboard) },
+      { path: 'group/:id', loadComponent: () => import('./group-manager/group-detail/group-detail').then(m => m.GroupDetail) },
+      { path: 'quiz/:id/questions', loadComponent: () => import('./group-manager/quiz-questions/gm-quiz-questions').then(m => m.GmQuizQuestions) },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+  },
+
   // Legacy home redirect
   { path: 'home', loadComponent: () => import('./home/home').then(m => m.Home), canActivate: [authGuard] },
 

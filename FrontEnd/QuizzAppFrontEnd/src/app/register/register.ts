@@ -44,10 +44,7 @@ export class Register {
         if (res.success) {
           this.auth.saveSession(res.data);
           this.toast.success('Account created successfully!');
-          const role = res.data.role;
-          if (role === 'Admin') this.router.navigate(['/admin/dashboard']);
-          else if (role === 'QuizCreator') this.router.navigate(['/creator/my-quizzes']);
-          else this.router.navigate(['/taker/browse']);
+          this.router.navigate(['/home']);
         } else {
           this.toast.error(res.message);
         }

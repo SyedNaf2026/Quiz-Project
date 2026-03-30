@@ -42,6 +42,7 @@ namespace QuizzApp
             builder.Services.AddScoped<IQuizAttemptService, QuizAttemptService>();
             builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IGroupService, GroupService>();
 
             // SignalR for real-time notifications
             builder.Services.AddSignalR();

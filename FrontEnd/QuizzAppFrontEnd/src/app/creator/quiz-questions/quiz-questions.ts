@@ -27,6 +27,7 @@ export class QuizQuestions implements OnInit {
   editingId: number | null = null;
   editingText = '';
   editSaving = false;
+  uploading = false;
   qText = '';
   qType = 'MultipleChoice';
   options: { optionText: string; isCorrect: boolean }[] = [
@@ -165,5 +166,39 @@ export class QuizQuestions implements OnInit {
       },
       error: () => { this.editSaving = false; this.toast.error('Update failed.'); }
     });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    if (!file.name.endsWith('.xlsx')) { this.toast.error('Only .xlsx files are supported.'); return; }
+    this.uploading = true;
+    this.cdr.detectChanges();
+    this.questionService.uploadExcel(this.quizId, file).subscribe({
+      next: res => {
+        this.uploading = false;
+        if (res.success) { this.toast.success(res.data || 'Questions imported!'); this.loadQuestions(); }
+        else this.toast.error(res.message || 'Import failed.');
+        input.value = '';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.uploading = false;
+        this.toast.error('Failed to upload file.');
+        input.value = '';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  downloadTemplate(): void {
+    const headers = ['QuestionText','QuestionType','Option1Text','Option1Correct','Option2Text','Option2Correct','Option3Text','Option3Correct','Option4Text','Option4Correct'].join('\t');
+    const example = ['What is 2+2?','MultipleChoice','3','false','4','true','5','false','6','false'].join('\t');
+    const blob = new Blob([headers + '\n' + example], { type: 'text/tab-separated-values' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'question-bank-template.xls'; a.click();
+    URL.revokeObjectURL(url);
   }
 }

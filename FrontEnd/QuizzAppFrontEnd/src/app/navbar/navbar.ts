@@ -116,6 +116,7 @@ export class Navbar implements OnInit, OnDestroy {
   isAdmin() { return this.role === 'Admin'; }
   isCreator() { return this.role === 'QuizCreator'; }
   isTaker() { return this.role === 'QuizTaker'; }
+  isGroupManager() { return this.role === 'GroupManager'; }
 
   ngOnDestroy(): void {
     this.notifSub?.unsubscribe();

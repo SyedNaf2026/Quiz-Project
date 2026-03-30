@@ -5,6 +5,37 @@
       <h1 class="page-title">Browse Quizzes</h1>
     </div>
 
+    <!-- Group Assigned Quizzes -->
+    @if (groupQuizzes.length > 0) {
+      <div class="mb-3">
+        <h2 style="font-size:1.1rem;margin-bottom:0.75rem;color:var(--text)">👥 Assigned to You by Group</h2>
+        <div class="grid grid-2">
+          @for (gq of groupQuizzes; track gq.groupQuizId) {
+            <div class="quiz-card" style="border-left:3px solid var(--primary)">
+              <div class="d-flex justify-between align-center">
+                <h3 class="quiz-card-title">{{ gq.quizTitle }}</h3>
+                <span class="badge badge-info">Group Quiz</span>
+              </div>
+              <div class="quiz-card-meta">
+                <span>🏷️ {{ gq.categoryName }}</span>
+                <span>❓ {{ gq.totalQuestions }} questions</span>
+                <span>📅 {{ gq.assignedAt | date:'mediumDate' }}</span>
+              </div>
+              <div class="quiz-card-actions">
+                @if (isGroupQuizDone(gq.quizId)) {
+                  <span class="badge badge-success" style="padding:0.4rem 0.8rem;font-size:0.8rem">✅ Submitted</span>
+                  <a [routerLink]="['/taker/take', gq.quizId]" class="btn btn-outline btn-sm">Retake</a>
+                } @else {
+                  <a [routerLink]="['/taker/take', gq.quizId]" class="btn btn-primary btn-sm">Start Quiz</a>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin-bottom:1.5rem">
+    }
+
     <!-- Filters -->
     <div class="d-flex gap-1 flex-wrap mb-3">
       <input type="text" class="form-control" style="max-width:280px"

@@ -61,9 +61,9 @@ namespace QuizzApp.Controllers
         }
 
         // POST api/quiz
-        // Create a new quiz (QuizCreator only)
+        // Create a new quiz (QuizCreator or GroupManager)
         [HttpPost]
-        [Authorize(Roles = "QuizCreator")]
+        [Authorize(Roles = "QuizCreator,GroupManager")]
         public async Task<IActionResult> Create([FromBody] CreateQuizDTO dto)
         {
             //var (success, message, data) = await _quizService.CreateQuizAsync(dto,2);

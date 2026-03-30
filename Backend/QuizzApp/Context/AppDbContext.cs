@@ -20,6 +20,10 @@ namespace QuizzApp.Context
         public DbSet<QuizResult> QuizResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<GroupQuiz> GroupQuizzes { get; set; }
+        public DbSet<GroupQuizResult> GroupQuizResults { get; set; }
 
         // OnModelCreating is used to configure relationships and constraints
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -116,6 +120,67 @@ namespace QuizzApp.Context
                     .HasForeignKey(n => n.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired(false);
+            });
+
+            modelBuilder.Entity<Group>(entity =>
+            {
+                entity.Property(g => g.Name).IsRequired().HasMaxLength(100);
+                entity.Property(g => g.Description).HasMaxLength(500);
+
+                entity.HasOne(g => g.Creator)
+                    .WithMany()
+                    .HasForeignKey(g => g.CreatedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<GroupMember>(entity =>
+            {
+                entity.HasIndex(gm => new { gm.GroupId, gm.UserId }).IsUnique();
+
+                entity.HasOne(gm => gm.Group)
+                    .WithMany(g => g.Members)
+                    .HasForeignKey(gm => gm.GroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(gm => gm.User)
+                    .WithMany()
+                    .HasForeignKey(gm => gm.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<GroupQuiz>(entity =>
+            {
+                entity.HasIndex(gq => new { gq.GroupId, gq.QuizId }).IsUnique();
+
+                entity.HasOne(gq => gq.Group)
+                    .WithMany(g => g.GroupQuizzes)
+                    .HasForeignKey(gq => gq.GroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(gq => gq.Quiz)
+                    .WithMany()
+                    .HasForeignKey(gq => gq.QuizId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<GroupQuizResult>(entity =>
+            {
+                entity.Property(gr => gr.ValidationStatus).IsRequired().HasMaxLength(20);
+
+                entity.HasOne(gr => gr.GroupQuiz)
+                    .WithMany(gq => gq.GroupQuizResults)
+                    .HasForeignKey(gr => gr.GroupQuizId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(gr => gr.User)
+                    .WithMany()
+                    .HasForeignKey(gr => gr.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(gr => gr.QuizResult)
+                    .WithMany()
+                    .HasForeignKey(gr => gr.QuizResultId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

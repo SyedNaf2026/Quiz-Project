@@ -7,8 +7,36 @@
         <button class="btn btn-primary" (click)="toggleForm()">
           {{ showForm ? '✕ Cancel' : '+ Add Question' }}
         </button>
+        <!-- Excel Upload -->
+        <label class="btn btn-success" style="cursor:pointer;margin:0">
+          {{ uploading ? '⏳ Uploading...' : '📤 Upload Excel' }}
+          <input type="file" accept=".xlsx" style="display:none" (change)="onFileSelected($event)" [disabled]="uploading">
+        </label>
+        <button class="btn btn-outline" (click)="downloadTemplate()" title="Download Excel template">
+          📥 Template
+        </button>
         <a routerLink="/creator/my-quizzes" class="btn btn-outline">← Back</a>
       </div>
+    </div>
+
+    <!-- Excel format hint -->
+    <div class="card p-3 mb-3" style="background:rgba(79,70,229,0.05);border:1px solid rgba(79,70,229,0.2)">
+      <p style="font-weight:600;margin:0 0 0.5rem;color:var(--text)">📋 Excel Column Format</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.4rem">
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 1</span><span style="color:var(--text-muted);margin-left:0.3rem">QuestionText</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 2</span><span style="color:var(--text-muted);margin-left:0.3rem">QuestionType</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 3</span><span style="color:var(--text-muted);margin-left:0.3rem">Option1Text</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 4</span><span style="color:var(--text-muted);margin-left:0.3rem">Option1Correct</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 5</span><span style="color:var(--text-muted);margin-left:0.3rem">Option2Text</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 6</span><span style="color:var(--text-muted);margin-left:0.3rem">Option2Correct</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 7</span><span style="color:var(--text-muted);margin-left:0.3rem">Option3Text</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 8</span><span style="color:var(--text-muted);margin-left:0.3rem">Option3Correct</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 9</span><span style="color:var(--text-muted);margin-left:0.3rem">Option4Text</span></div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.78rem"><span style="color:var(--primary);font-weight:600">Col 10</span><span style="color:var(--text-muted);margin-left:0.3rem">Option4Correct</span></div>
+      </div>
+      <p style="margin:0.5rem 0 0;font-size:0.78rem;color:var(--text-muted)">
+        QuestionType: <strong>MultipleChoice</strong> / <strong>MultipleAnswer</strong> / <strong>TrueFalse</strong> / <strong>YesNo</strong> &nbsp;|&nbsp; Correct: <strong>true</strong> or <strong>false</strong> &nbsp;|&nbsp; Row 1 = headers, data from Row 2
+      </p>
     </div>
 
     @if (showForm) {

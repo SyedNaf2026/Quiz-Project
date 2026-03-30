@@ -74,6 +74,284 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "Create",
+    "RelativePath": "api/Group",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "QuizzApp.DTOs.CreateGroupDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetMyGroups",
+    "RelativePath": "api/Group",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetById",
+    "RelativePath": "api/Group/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "Delete",
+    "RelativePath": "api/Group/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetMembers",
+    "RelativePath": "api/Group/{id}/members",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "AddMember",
+    "RelativePath": "api/Group/{id}/members/{userId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "RemoveMember",
+    "RelativePath": "api/Group/{id}/members/{userId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetGroupQuizzes",
+    "RelativePath": "api/Group/{id}/quizzes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "AssignQuiz",
+    "RelativePath": "api/Group/{id}/quizzes/{quizId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "quizId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "RemoveQuiz",
+    "RelativePath": "api/Group/{id}/quizzes/{quizId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "quizId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "SetRequiresValidation",
+    "RelativePath": "api/Group/{id}/quizzes/{quizId}/require-validation",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "quizId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetSubmissions",
+    "RelativePath": "api/Group/{id}/submissions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetCompletedGroupQuizIds",
+    "RelativePath": "api/Group/completed-quiz-ids",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetMyGroupQuizzes",
+    "RelativePath": "api/Group/my-quizzes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "GetMyGroupResults",
+    "RelativePath": "api/Group/my-results",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "SearchUsers",
+    "RelativePath": "api/Group/search-users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "query",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.GroupController",
+    "Method": "Validate",
+    "RelativePath": "api/Group/submissions/{resultId}/validate",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "resultId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "QuizzApp.Controllers.ValidateDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "QuizzApp.Controllers.LeaderboardController",
     "Method": "GetLeaderboard",
     "RelativePath": "api/Leaderboard",
@@ -174,6 +452,27 @@
         "Name": "id",
         "Type": "System.Int32",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.QuestionController",
+    "Method": "UploadExcel",
+    "RelativePath": "api/Question/bulk/{quizId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "quizId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

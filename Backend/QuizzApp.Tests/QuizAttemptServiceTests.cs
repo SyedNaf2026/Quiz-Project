@@ -23,7 +23,6 @@ namespace QuizzApp.Tests
             _quizRepoMock   = new Mock<IGenericRepository<Quiz>>();
             _notifMock      = new Mock<INotificationService>();
 
-            // Notification calls are fire-and-forget in tests — just complete
             _notifMock.Setup(n => n.SendToAllTakersAsync(It.IsAny<string>(), It.IsAny<string>()))
                       .Returns(Task.CompletedTask);
             _notifMock.Setup(n => n.SendToUserAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))

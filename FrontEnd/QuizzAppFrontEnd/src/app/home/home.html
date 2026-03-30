@@ -9,7 +9,7 @@
         Welcome back, {{ userName }}!
       </h1>
       <p style="color:var(--text-muted);font-size:1rem;margin-bottom:1.5rem">
-        {{ isCreator ? 'Ready to create something amazing today?' : 'Ready to test your knowledge today?' }}
+        {{ isCreator ? 'Ready to create something amazing today?' : isGroupManager ? 'Ready to manage your groups today?' : 'Ready to test your knowledge today?' }}
       </p>
       <div class="d-flex gap-1 justify-center flex-wrap">
         @if (isCreator) {
@@ -20,6 +20,9 @@
           <a routerLink="/taker/browse" class="btn btn-primary btn-lg">🔍 Browse Quizzes</a>
           <a routerLink="/taker/results" class="btn btn-outline btn-lg">📊 My Results</a>
           <a routerLink="/taker/leaderboard" class="btn btn-outline btn-lg">🏆 Leaderboard</a>
+        }
+        @if (isGroupManager) {
+          <a routerLink="/group-manager/dashboard" class="btn btn-primary btn-lg">👥 My Groups</a>
         }
       </div>
     </div>
@@ -48,7 +51,8 @@
       </div>
     </div>
 
-    <!-- How It Works -->
+    <!-- How It Works — hidden for GroupManager -->
+    @if (!isGroupManager) {
     <div class="card p-3 mb-3">
       <h2 style="color:var(--text);margin-bottom:1.25rem;font-size:1.3rem">
         {{ isCreator ? '🛠️ How to Create a Quiz' : '🎯 How to Take a Quiz' }}
@@ -102,9 +106,10 @@
         }
       </div>
     </div>
+    }
 
     <!-- FAQ — only for QuizTakers -->
-    @if (!isCreator) {
+    @if (!isCreator && !isGroupManager) {
     <div class="mb-3">
       <h2 style="color:var(--text);margin-bottom:1rem;font-size:1.3rem">❓ Frequently Asked Questions</h2>
       @for (faq of faqs; track faq.q; let i = $index) {

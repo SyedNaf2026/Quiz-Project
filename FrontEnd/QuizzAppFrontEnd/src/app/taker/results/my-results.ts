@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Navbar } from '../../navbar/navbar';
 import { QuizAttemptService } from '../../service/quiz-attempt.service';
+import { GroupService } from '../../service/group.service';
 import { ToastService } from '../../service/toast.service';
-import { QuizResultDTO } from '../../models/models';
+import { QuizResultDTO, GroupQuizResultDTO } from '../../models/models';
 import jsPDF from 'jspdf';
 
 @Component({
@@ -15,12 +16,16 @@ import jsPDF from 'jspdf';
 })
 export class MyResults implements OnInit {
   results: QuizResultDTO[] = [];
+  groupResults: GroupQuizResultDTO[] = [];
   loading = true;
+  groupLoading = true;
   selectedResult: QuizResultDTO | null = null;
   showCertModal = false;
+  activeTab: 'individual' | 'group' = 'individual';
 
   constructor(
     private attemptService: QuizAttemptService,
+    private groupService: GroupService,
     private toast: ToastService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -44,6 +49,10 @@ export class MyResults implements OnInit {
     this.attemptService.getMyResults().subscribe({
       next: (res) => { this.results = res.data || []; this.loading = false; this.cdr.detectChanges(); },
       error: () => { this.loading = false; this.cdr.detectChanges(); this.toast.error('Failed to load results.'); }
+    });
+    this.groupService.getMyGroupResults().subscribe({
+      next: (res) => { this.groupResults = res.data || []; this.groupLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.groupLoading = false; this.cdr.detectChanges(); }
     });
   }
 

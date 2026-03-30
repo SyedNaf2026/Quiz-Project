@@ -1,0 +1,261 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+
+    @if (loading) {
+      <div class="skeleton" style="height:60px;border-radius:8px;margin-bottom:1rem"></div>
+    } @else if (group) {
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">{{ group.name }}</h1>
+          <p class="text-muted">{{ group.description }}</p>
+        </div>
+        <a routerLink="/group-manager/dashboard" class="btn btn-outline">← Back</a>
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div class="tabs mb-3">
+      <button class="tab-btn" [class.active]="activeTab === 'members'" (click)="activeTab = 'members'">
+        👤 Members ({{ members.length }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'quizzes'" (click)="activeTab = 'quizzes'">
+        📝 Quizzes ({{ groupQuizzes.length }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'create-quiz'" (click)="activeTab = 'create-quiz'">
+        ➕ Create Quiz
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'submissions'" (click)="activeTab = 'submissions'">
+        ✅ Submissions ({{ submissions.length }})
+      </button>
+    </div>
+
+    <!-- Members Tab -->
+    @if (activeTab === 'members') {
+      <div class="card p-3 mb-3">
+        <h3 class="mb-2">Search & Add Members</h3>
+        <input type="text" class="form-control" [(ngModel)]="searchQuery"
+          placeholder="Search by name or email..." (input)="onSearch()">
+        @if (searchLoading) {
+          <p class="text-muted mt-2">Searching...</p>
+        }
+        @if (searchResults.length > 0) {
+          <div class="mt-2" style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            @for (u of searchResults; track u.id) {
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 1rem;border-bottom:1px solid var(--border)">
+                <div>
+                  <strong>{{ u.fullName }}</strong>
+                  <span class="text-muted" style="font-size:0.8rem;margin-left:0.5rem">{{ u.email }}</span>
+                </div>
+                <button class="btn btn-sm btn-primary" (click)="addMember(u)">Add</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (members.length === 0) {
+        <div class="empty-state"><div class="empty-icon">👤</div><p>No members yet.</p></div>
+      } @else {
+        <div class="card">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="padding:0.75rem 1rem;text-align:left">Name</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Email</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Joined</th>
+                <th style="padding:0.75rem 1rem"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of members; track m.id) {
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:0.75rem 1rem">{{ m.fullName }}</td>
+                  <td style="padding:0.75rem 1rem;color:var(--text-muted)">{{ m.email }}</td>
+                  <td style="padding:0.75rem 1rem;color:var(--text-muted);font-size:0.8rem">{{ m.joinedAt | date:'mediumDate' }}</td>
+                  <td style="padding:0.75rem 1rem;text-align:right">
+                    <button class="btn btn-sm btn-outline" style="color:#ef4444;border-color:#ef4444" (click)="removeMember(m)">Remove</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    <!-- Quizzes Tab -->
+    @if (activeTab === 'quizzes') {
+      <div class="card p-3 mb-3">
+        <h3 class="mb-2">Assign Existing Quizzes</h3>
+        @if (allQuizzes.length === 0) {
+          <p class="text-muted">No active quizzes available.</p>
+        } @else {
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+            @for (q of allQuizzes; track q.id) {
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:8px">
+                <div>
+                  <strong>{{ q.title }}</strong>
+                  <span class="text-muted" style="font-size:0.8rem;margin-left:0.5rem">{{ q.categoryName }}</span>
+                </div>
+                @if (isAssigned(q.id)) {
+                  <button class="btn btn-sm btn-outline" style="color:#ef4444;border-color:#ef4444" (click)="removeQuiz(q.id)">Remove</button>
+                } @else {
+                  <button class="btn btn-sm btn-primary" (click)="assignQuiz(q.id)">Assign</button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (groupQuizzes.length > 0) {
+        <h3 class="mb-2">Assigned Quizzes</h3>
+        <div class="card">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="padding:0.75rem 1rem;text-align:left">Quiz</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Category</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Questions</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Assigned</th>
+                <th style="padding:0.75rem 1rem"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (gq of groupQuizzes; track gq.groupQuizId) {
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:0.75rem 1rem">{{ gq.quizTitle }}</td>
+                  <td style="padding:0.75rem 1rem;color:var(--text-muted)">{{ gq.categoryName }}</td>
+                  <td style="padding:0.75rem 1rem">{{ gq.totalQuestions }}</td>
+                  <td style="padding:0.75rem 1rem;color:var(--text-muted);font-size:0.8rem">{{ gq.assignedAt | date:'mediumDate' }}</td>
+                  <td style="padding:0.75rem 1rem">
+                    <a [routerLink]="['/group-manager/quiz', gq.quizId, 'questions']" class="btn btn-sm btn-outline">✏️ Questions</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    <!-- Create Quiz Tab -->
+    @if (activeTab === 'create-quiz') {
+      <div class="card p-3">
+        <h3 class="mb-3">Create a New Quiz for this Group</h3>
+        <form [formGroup]="quizForm" (ngSubmit)="submitQuiz()">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" formControlName="title" placeholder="Quiz title"
+              [class.is-invalid]="quizForm.get('title')!.invalid && quizForm.get('title')!.touched">
+            @if (quizForm.get('title')!.invalid && quizForm.get('title')!.touched) {
+              <div class="invalid-feedback">Title is required.</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" placeholder="Optional description">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <select class="form-control" formControlName="categoryId"
+                [class.is-invalid]="quizForm.get('categoryId')!.invalid && quizForm.get('categoryId')!.touched">
+                <option value="">Select category</option>
+                @for (c of categories; track c.id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
+              </select>
+              <button type="button" class="btn btn-outline btn-sm" (click)="showNewCategory = !showNewCategory">
+                {{ showNewCategory ? '✕' : '+ New' }}
+              </button>
+            </div>
+            @if (quizForm.get('categoryId')!.invalid && quizForm.get('categoryId')!.touched) {
+              <div class="invalid-feedback">Category is required.</div>
+            }
+          </div>
+
+          @if (showNewCategory) {
+            <div class="card p-2 mb-2" style="background:var(--bg)">
+              <div class="form-group">
+                <input type="text" class="form-control" [(ngModel)]="newCategoryName" [ngModelOptions]="{standalone:true}" placeholder="Category name">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" [(ngModel)]="newCategoryDesc" [ngModelOptions]="{standalone:true}" placeholder="Description (optional)">
+              </div>
+              <button type="button" class="btn btn-success btn-sm" (click)="addCategory()">Save Category</button>
+            </div>
+          }
+
+          <div class="form-group">
+            <label class="form-label">Time Limit (minutes)</label>
+            <input type="number" class="form-control" formControlName="timeLimit" placeholder="Leave empty for no limit" min="1">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Difficulty</label>
+            <select class="form-control" formControlName="difficulty">
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="quizLoading">
+            {{ quizLoading ? 'Creating...' : '➕ Create & Assign to Group' }}
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- Submissions Tab -->
+    @if (activeTab === 'submissions') {
+      @if (submissions.length === 0) {
+        <div class="empty-state"><div class="empty-icon">📋</div><p>No submissions yet.</p></div>
+      } @else {
+        <div class="card">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="padding:0.75rem 1rem;text-align:left">Member</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Quiz</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Score</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Status</th>
+                <th style="padding:0.75rem 1rem;text-align:left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of submissions; track s.id) {
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:0.75rem 1rem">{{ s.userName }}</td>
+                  <td style="padding:0.75rem 1rem">{{ s.quizTitle }}</td>
+                  <td style="padding:0.75rem 1rem">{{ s.score }}/{{ s.totalQuestions }} ({{ s.percentage | number:'1.0-0' }}%)</td>
+                  <td style="padding:0.75rem 1rem">
+                    <span class="badge" [style.background]="s.validationStatus === 'Approved' ? '#10b981' : '#f59e0b'" style="color:#fff">
+                      {{ s.validationStatus }}
+                    </span>
+                  </td>
+                  <td style="padding:0.75rem 1rem">
+                    @if (s.requiresValidation) {
+                      @if (s.validationStatus !== 'Approved') {
+                        <button class="btn btn-sm btn-primary" (click)="validate(s, 'Approved')">Approve</button>
+                      } @else {
+                        <button class="btn btn-sm btn-outline" (click)="validate(s, 'Pending')">Revoke</button>
+                      }
+                    } @else {
+                      <span class="badge badge-secondary">Auto</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+  </div>
+</div>

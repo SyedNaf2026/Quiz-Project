@@ -1,0 +1,65 @@
+<div class="page-wrapper">
+  <app-navbar />
+  <div class="main-content">
+
+    <div class="page-header">
+      <h1 class="page-title">👥 My Groups</h1>
+      <button class="btn btn-primary" (click)="showForm = !showForm">
+        {{ showForm ? '✕ Cancel' : '+ New Group' }}
+      </button>
+    </div>
+
+    @if (showForm) {
+      <div class="card p-3 mb-3">
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-group">
+            <label class="form-label">Group Name</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Enter group name"
+              [class.is-invalid]="form.get('name')!.invalid && form.get('name')!.touched">
+            @if (form.get('name')!.invalid && form.get('name')!.touched) {
+              <div class="invalid-feedback">Name is required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" formControlName="description" placeholder="Optional description">
+          </div>
+          <button type="submit" class="btn btn-success">Create Group</button>
+        </form>
+      </div>
+    }
+
+    @if (loading) {
+      @for (i of [1,2,3]; track i) {
+        <div class="skeleton mb-2" style="height:80px;border-radius:8px"></div>
+      }
+    } @else if (groups.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <p>No groups yet. Create your first group!</p>
+      </div>
+    } @else {
+      <div class="grid-cards">
+        @for (g of groups; track g.id) {
+          <div class="card p-3">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <h3 style="margin:0 0 4px">{{ g.name }}</h3>
+                <p class="text-muted" style="margin:0 0 8px;font-size:0.85rem">{{ g.description || 'No description' }}</p>
+                <div style="display:flex;gap:1rem;font-size:0.8rem;color:var(--text-muted)">
+                  <span>👤 {{ g.memberCount }} members</span>
+                  <span>📝 {{ g.quizCount }} quizzes</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.5rem">
+                <a [routerLink]="['/group-manager/group', g.id]" class="btn btn-sm btn-primary">Manage</a>
+                <button class="btn btn-sm btn-outline" style="color:#ef4444;border-color:#ef4444" (click)="deleteGroup(g.id)">Delete</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>

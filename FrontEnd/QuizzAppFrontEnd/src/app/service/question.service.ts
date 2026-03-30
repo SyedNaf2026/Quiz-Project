@@ -26,4 +26,10 @@ export class QuestionService {
   deleteQuestion(id: number): Observable<ApiResponse<string>> {
     return this.http.delete<ApiResponse<string>>(`${this.baseUrl}/${id}`);
   }
+
+  uploadExcel(quizId: number, file: File): Observable<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/bulk/${quizId}`, formData);
+  }
 }

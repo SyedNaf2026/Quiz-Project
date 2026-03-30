@@ -635,3 +635,40 @@ tr:hover td { background: rgba(79,70,229,0.04); }
   .q-nav-panel { width: 100%; position: static; }
   .q-nav-grid { grid-template-columns: repeat(6, 1fr); }
 }
+
+/* ===== Tabs ===== */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.tab-btn:hover { color: var(--primary); }
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: rgba(79,70,229,0.05);
+}
+
+/* ===== Grid Cards ===== */
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}

@@ -45,6 +45,130 @@ namespace QuizzApp.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("QuizzApp.Models.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("GroupId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("GroupMembers");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupQuiz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RequiresValidation")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("GroupId", "QuizId")
+                        .IsUnique();
+
+                    b.ToTable("GroupQuizzes");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupQuizResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupQuizId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizResultId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ValidationStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupQuizId");
+
+                    b.HasIndex("QuizResultId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GroupQuizResults");
+                });
+
             modelBuilder.Entity("QuizzApp.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -279,6 +403,82 @@ namespace QuizzApp.Migrations
                     b.ToTable("UserAnswers");
                 });
 
+            modelBuilder.Entity("QuizzApp.Models.Group", b =>
+                {
+                    b.HasOne("QuizzApp.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupMember", b =>
+                {
+                    b.HasOne("QuizzApp.Models.Group", "Group")
+                        .WithMany("Members")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizzApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupQuiz", b =>
+                {
+                    b.HasOne("QuizzApp.Models.Group", "Group")
+                        .WithMany("GroupQuizzes")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizzApp.Models.Quiz", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupQuizResult", b =>
+                {
+                    b.HasOne("QuizzApp.Models.GroupQuiz", "GroupQuiz")
+                        .WithMany("GroupQuizResults")
+                        .HasForeignKey("GroupQuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizzApp.Models.QuizResult", "QuizResult")
+                        .WithMany()
+                        .HasForeignKey("QuizResultId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("QuizzApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GroupQuiz");
+
+                    b.Navigation("QuizResult");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("QuizzApp.Models.Notification", b =>
                 {
                     b.HasOne("QuizzApp.Models.User", "User")
@@ -371,6 +571,18 @@ namespace QuizzApp.Migrations
             modelBuilder.Entity("QuizzApp.Models.Category", b =>
                 {
                     b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.Group", b =>
+                {
+                    b.Navigation("GroupQuizzes");
+
+                    b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("QuizzApp.Models.GroupQuiz", b =>
+                {
+                    b.Navigation("GroupQuizResults");
                 });
 
             modelBuilder.Entity("QuizzApp.Models.Question", b =>

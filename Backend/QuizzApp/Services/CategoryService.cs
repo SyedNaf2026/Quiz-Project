@@ -45,8 +45,5 @@ namespace QuizzApp.Services
             });
         }
 
-        //public async void DeleteCategoryAsync(int id) { 
-
-        //}
     }
 }

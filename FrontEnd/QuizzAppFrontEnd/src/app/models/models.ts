@@ -176,3 +176,57 @@ export interface NotificationDTO {
   isRead: boolean;
   createdAt: string;
 }
+
+// ===== Group Manager =====
+export interface GroupDTO {
+  id: number;
+  name: string;
+  description: string;
+  creatorName: string;
+  memberCount: number;
+  quizCount: number;
+  createdAt: string;
+}
+
+export interface CreateGroupDTO {
+  name: string;
+  description: string;
+}
+
+export interface GroupMemberDTO {
+  id: number;
+  userId: number;
+  fullName: string;
+  email: string;
+  joinedAt: string;
+}
+
+export interface GroupQuizDTO {
+  groupQuizId: number;
+  quizId: number;
+  quizTitle: string;
+  categoryName: string;
+  totalQuestions: number;
+  assignedAt: string;
+  requiresValidation: boolean;
+}
+
+export interface GroupQuizResultDTO {
+  id: number;
+  userId: number;
+  userName: string;
+  groupName: string;
+  quizTitle: string;
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  validationStatus: string;
+  requiresValidation: boolean;
+  submittedAt: string;
+}
+
+export interface UserSearchDTO {
+  id: number;
+  fullName: string;
+  email: string;
+}

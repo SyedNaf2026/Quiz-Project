@@ -43,7 +43,17 @@ namespace QuizzApp.Services
             if (existingAttempt.Any())
             {
                 foreach (var old in existingAttempt)
+                {
+                    // Remove any GroupQuizResult referencing this QuizResult first
+                    var gqr = await _context.GroupQuizResults
+                        .Where(g => g.QuizResultId == old.Id).ToListAsync();
+                    if (gqr.Any())
+                    {
+                        _context.GroupQuizResults.RemoveRange(gqr);
+                        await _context.SaveChangesAsync();
+                    }
                     await _resultRepo.DeleteAsync(old);
+                }
                 var oldAnswers = await _answerRepo.FindAsync(a => a.UserId == userId && a.QuizId == dto.QuizId);
                 foreach (var old in oldAnswers)
                     await _answerRepo.DeleteAsync(old);
@@ -132,7 +142,42 @@ namespace QuizzApp.Services
                 Percentage = percentage,
                 CompletedAt = DateTime.UtcNow
             };
-            await _resultRepo.AddAsync(quizResult);
+
+            // Save directly via context so the Id is populated and no double-save conflict
+            _context.QuizResults.Add(quizResult);
+            await _context.SaveChangesAsync();
+
+            // ── Group quiz result ────────────────────────────────────────
+            var groupQuiz = await _context.GroupQuizzes
+                .Include(gq => gq.Group)
+                    .ThenInclude(g => g!.Members)
+                .FirstOrDefaultAsync(gq =>
+                    gq.QuizId == dto.QuizId &&
+                    gq.Group!.Members.Any(m => m.UserId == userId));
+
+            if (groupQuiz != null)
+            {
+                var existingGqr = await _context.GroupQuizResults
+                    .FirstOrDefaultAsync(gr => gr.GroupQuizId == groupQuiz.Id && gr.UserId == userId);
+                if (existingGqr != null)
+                {
+                    existingGqr.QuizResultId = quizResult.Id;
+                    existingGqr.ValidationStatus = "Pending";
+                    existingGqr.SubmittedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    _context.GroupQuizResults.Add(new GroupQuizResult
+                    {
+                        GroupQuizId = groupQuiz.Id,
+                        UserId = userId,
+                        QuizResultId = quizResult.Id,
+                        ValidationStatus = "Pending"
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+            // ────────────────────────────────────────────────────────────
 
             // ── Leaderboard notification logic ──────────────────────────
             // Get the overall leaderboard BEFORE this result was saved to find previous #1
@@ -188,9 +233,17 @@ namespace QuizzApp.Services
 
         public async Task<IEnumerable<QuizResultDTO>> GetUserResultsAsync(int userId)
         {
+            // Get quiz IDs that belong to group quizzes for this user — exclude from individual results
+            var groupQuizIds = await _context.GroupQuizResults
+                .Include(gr => gr.GroupQuiz)
+                .Where(gr => gr.UserId == userId)
+                .Select(gr => gr.GroupQuiz!.QuizId)
+                .Distinct()
+                .ToListAsync();
+
             var results = await _context.QuizResults
                 .Include(r => r.Quiz)
-                .Where(r => r.UserId == userId)
+                .Where(r => r.UserId == userId && !groupQuizIds.Contains(r.QuizId))
                 .OrderByDescending(r => r.CompletedAt)
                 .ToListAsync();
 

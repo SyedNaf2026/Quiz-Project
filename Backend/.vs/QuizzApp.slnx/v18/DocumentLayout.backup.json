@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "C:\\Syed\\Quiz-Project\\Backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Migrations\\20260327064337_AddNotification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:QuizzApp\\Migrations\\20260327064337_AddNotification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Migrations\\20260330113627_AddGroupQuizRequiresValidation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:QuizzApp\\Migrations\\20260330113627_AddGroupQuizRequiresValidation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EF7CA9A3-6352-B3C6-BC14-18262B91A3EA}|QuizzApp.Tests\\QuizzApp.Tests.csproj|c:\\syed\\quiz-project\\backend\\quizzapp.tests\\quizservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EF7CA9A3-6352-B3C6-BC14-18262B91A3EA}|QuizzApp.Tests\\QuizzApp.Tests.csproj|solutionrelative:quizzapp.tests\\quizservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\controllers\\questioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\controllers\\questioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EF7CA9A3-6352-B3C6-BC14-18262B91A3EA}|QuizzApp.Tests\\QuizzApp.Tests.csproj|c:\\syed\\quiz-project\\backend\\quizzapp.tests\\quizattemptservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EF7CA9A3-6352-B3C6-BC14-18262B91A3EA}|QuizzApp.Tests\\QuizzApp.Tests.csproj|solutionrelative:quizzapp.tests\\quizattemptservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\controllers\\quizcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\controllers\\quizcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\services\\groupservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\services\\groupservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -39,40 +43,53 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "20260327064337_AddNotification.cs",
-              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Migrations\\20260327064337_AddNotification.cs",
-              "RelativeDocumentMoniker": "QuizzApp\\Migrations\\20260327064337_AddNotification.cs",
-              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Migrations\\20260327064337_AddNotification.cs",
-              "RelativeToolTip": "QuizzApp\\Migrations\\20260327064337_AddNotification.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAuwB4AAAAuAAAAAAAAAA==",
+              "Title": "20260330113627_AddGroupQuizRequiresValidation.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Migrations\\20260330113627_AddGroupQuizRequiresValidation.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Migrations\\20260330113627_AddGroupQuizRequiresValidation.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Migrations\\20260330113627_AddGroupQuizRequiresValidation.cs",
+              "RelativeToolTip": "QuizzApp\\Migrations\\20260330113627_AddGroupQuizRequiresValidation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-27T06:43:37.875Z",
+              "WhenOpened": "2026-03-30T11:36:28.154Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "QuizServiceTests.cs",
-              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\QuizServiceTests.cs",
-              "RelativeDocumentMoniker": "QuizzApp.Tests\\QuizServiceTests.cs",
-              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\QuizServiceTests.cs",
-              "RelativeToolTip": "QuizzApp.Tests\\QuizServiceTests.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAQwCIAAAAZAAAAAAAAAA==",
+              "Title": "QuestionController.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Controllers\\QuestionController.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Controllers\\QuestionController.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Controllers\\QuestionController.cs",
+              "RelativeToolTip": "QuizzApp\\Controllers\\QuestionController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-27T06:37:28.899Z",
+              "WhenOpened": "2026-03-30T09:20:44.776Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "QuizAttemptServiceTests.cs",
-              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\QuizAttemptServiceTests.cs",
-              "RelativeDocumentMoniker": "QuizzApp.Tests\\QuizAttemptServiceTests.cs",
-              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp.Tests\\QuizAttemptServiceTests.cs",
-              "RelativeToolTip": "QuizzApp.Tests\\QuizAttemptServiceTests.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAWwDAAAAA/AAAAAAAAAA==",
+              "Title": "QuizController.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Controllers\\QuizController.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Controllers\\QuizController.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Controllers\\QuizController.cs",
+              "RelativeToolTip": "QuizzApp\\Controllers\\QuizController.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAkwFgAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-27T06:36:42.513Z",
+              "WhenOpened": "2026-03-30T07:20:10.563Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "GroupService.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Services\\GroupService.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Services\\GroupService.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Services\\GroupService.cs",
+              "RelativeToolTip": "QuizzApp\\Services\\GroupService.cs",
+              "ViewState": "AgIAAIMAAAAAAAAAAAAUwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T07:19:34.513Z",
               "EditorCaption": ""
             }
           ]

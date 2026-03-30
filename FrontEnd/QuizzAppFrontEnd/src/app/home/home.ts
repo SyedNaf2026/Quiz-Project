@@ -86,4 +86,5 @@ export class Home implements OnInit, OnDestroy {
 
   get isCreator(): boolean { return this.role === 'QuizCreator'; }
   get isTaker(): boolean { return this.role === 'QuizTaker'; }
+  get isGroupManager(): boolean { return this.role === 'GroupManager'; }
 }

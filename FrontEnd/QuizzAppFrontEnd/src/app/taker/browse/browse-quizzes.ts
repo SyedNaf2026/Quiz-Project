@@ -4,8 +4,9 @@ import { RouterModule } from '@angular/router';
 import { Navbar } from '../../navbar/navbar';
 import { QuizService } from '../../service/quiz.service';
 import { CategoryService } from '../../service/category.service';
+import { GroupService } from '../../service/group.service';
 import { ToastService } from '../../service/toast.service';
-import { CategoryDTO, QuizDTO } from '../../models/models';
+import { CategoryDTO, QuizDTO, GroupQuizDTO } from '../../models/models';
 
 @Component({
   selector: 'app-browse-quizzes',
@@ -19,6 +20,8 @@ export class BrowseQuizzes implements OnInit {
   paged: QuizDTO[] = [];
   categories: CategoryDTO[] = [];
   availableDifficulties: string[] = [];
+  groupQuizzes: GroupQuizDTO[] = [];
+  completedGroupQuizIds: number[] = [];
 
   loading = true;
   search = '';
@@ -35,6 +38,7 @@ export class BrowseQuizzes implements OnInit {
   constructor(
     private quizService: QuizService,
     private categoryService: CategoryService,
+    private groupService: GroupService,
     private toast: ToastService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -56,6 +60,15 @@ export class BrowseQuizzes implements OnInit {
         this.cdr.detectChanges();
         setTimeout(() => this.toast.error('Failed to load quizzes.'), 0);
       }
+    });
+    // Load group-assigned quizzes for this taker
+    this.groupService.getMyGroupQuizzes().subscribe({
+      next: res => { this.groupQuizzes = res.data || []; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+    this.groupService.getCompletedGroupQuizIds().subscribe({
+      next: res => { this.completedGroupQuizIds = res.data || []; this.cdr.detectChanges(); },
+      error: () => {}
     });
   }
 
@@ -127,5 +140,9 @@ export class BrowseQuizzes implements OnInit {
   goToPage(p: number): void {
     this.page = p;
     this.updatePage();
+  }
+
+  isGroupQuizDone(quizId: number): boolean {
+    return this.completedGroupQuizIds.includes(quizId);
   }
 }
