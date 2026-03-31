@@ -63,7 +63,7 @@
             [class.unread]="!n.isRead"
             (click)="markRead(n)">
             <span class="notif-icon">
-              {{ n.type === 'quiz_added' ? '🆕' : n.type === 'quiz_deactivated' ? '🚫' : n.type === 'quiz_updated' ? '✏️' : n.type === 'rank_lost' ? '📉' : n.type === 'group_quiz_assigned' ? '📝' : '🏆' }}
+              {{ n.type === 'quiz_added' ? '🆕' : n.type === 'quiz_deactivated' ? '🚫' : n.type === 'quiz_updated' ? '✏️' : n.type === 'rank_lost' ? '📉' : n.type === 'group_quiz_assigned' ? '📝' : n.type === 'group_submission' ? '📋' : '🏆' }}
             </span>
             <div class="notif-body">
               <p>{{ n.message }}</p>

@@ -483,7 +483,6 @@ C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\staticwebassets.build.js
 C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\staticwebassets.development.json
 C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\staticwebassets.build.endpoints.json
 C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\swae.build.ex.cache
-C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\QuizzApp.csproj.Up2Date
 C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\QuizzApp.dll
 C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\refint\QuizzApp.dll

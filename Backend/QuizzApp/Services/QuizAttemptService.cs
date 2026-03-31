@@ -176,6 +176,15 @@ namespace QuizzApp.Services
                     });
                 }
                 await _context.SaveChangesAsync();
+
+                // Notify the GroupManager about the submission
+                var submitter = await _context.Users.FindAsync(userId);
+                var submitterName = submitter?.FullName ?? "A member";
+                var groupManagerId = groupQuiz.Group!.CreatedBy;
+                await _notificationService.SendToUserAsync(
+                    groupManagerId,
+                    $"📋 {submitterName} submitted \"{quiz.Title}\" in group \"{groupQuiz.Group.Name}\" — Score: {score}/{totalQuestions}",
+                    "group_submission");
             }
             // ────────────────────────────────────────────────────────────
 

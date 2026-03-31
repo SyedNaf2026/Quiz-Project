@@ -108,13 +108,14 @@ export class NotificationService implements OnDestroy {
   private getIcon(type: string): string {
     const map: Record<string, string> = {
       quiz_added: '🆕', quiz_deactivated: '🚫', quiz_updated: '✏️',
-      rank_lost: '📉', leaderboard_update: '🏆', group_quiz_assigned: '📝'
+      rank_lost: '📉', leaderboard_update: '🏆',
+      group_quiz_assigned: '📝', group_submission: '📋'
     };
     return map[type] ?? '🔔';
   }
 
   private getRoute(type: string): string {
-    const role = this.auth.getRole();
+    if (type === 'group_submission') return '/group-manager/dashboard';
     if (type === 'group_quiz_assigned') return '/taker/browse';
     if (type === 'quiz_added' || type === 'quiz_updated' || type === 'quiz_deactivated') return '/taker/browse';
     if (type === 'leaderboard_update' || type === 'rank_lost') return '/taker/leaderboard';
