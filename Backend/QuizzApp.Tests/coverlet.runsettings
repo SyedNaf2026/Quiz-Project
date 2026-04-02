@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <ExcludeByFile>
+            **/obj/**/*.cs,
+            **/Program.cs,
+            **/Migrations/**/*.cs,
+            **/Middleware/**/*.cs,
+            **/Hubs/**/*.cs
+          </ExcludeByFile>
+          <ExcludeByAttribute>
+            GeneratedCodeAttribute,
+            CompilerGeneratedAttribute
+          </ExcludeByAttribute>
+          <Exclude>
+            [*]Microsoft.AspNetCore.OpenApi.*,
+            [*]System.Runtime.CompilerServices.*
+          </Exclude>
+          <Include>
+            [QuizzApp]*QuizzApp.Services.*,
+            [QuizzApp]*QuizzApp.Repository.*
+          </Include>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

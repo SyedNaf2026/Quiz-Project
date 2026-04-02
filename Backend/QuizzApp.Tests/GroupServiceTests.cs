@@ -105,6 +105,8 @@ namespace QuizzApp.Tests
         public async Task GetMyGroups_ReturnsOnlyManagersGroups()
         {
             using var db = CreateDb("GS_GetMyGroups");
+            await SeedManager(db, 1);
+            await SeedManager(db, 2);
             db.Groups.AddRange(
                 new Group { Name = "G1", CreatedBy = 1 },
                 new Group { Name = "G2", CreatedBy = 2 }
