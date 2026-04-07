@@ -496,3 +496,4 @@ C:\Syed\Quiz-Project\Backend\QuizzApp\bin\Debug\net10.0\Microsoft.IO.RecyclableM
 C:\Syed\Quiz-Project\Backend\QuizzApp\bin\Debug\net10.0\Microsoft.Win32.SystemEvents.dll
 C:\Syed\Quiz-Project\Backend\QuizzApp\bin\Debug\net10.0\System.Drawing.Common.dll
 C:\Syed\Quiz-Project\Backend\QuizzApp\bin\Debug\net10.0\runtimes\win\lib\net8.0\Microsoft.Win32.SystemEvents.dll
+C:\Syed\Quiz-Project\Backend\QuizzApp\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

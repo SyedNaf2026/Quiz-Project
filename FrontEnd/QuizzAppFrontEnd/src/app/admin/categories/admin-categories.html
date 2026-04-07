@@ -54,14 +54,34 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               @for (cat of filtered; track cat.id) {
                 <tr>
                   <td>{{ cat.id }}</td>
-                  <td><strong>{{ cat.name }}</strong></td>
-                  <td class="text-muted">{{ cat.description || '—' }}</td>
+                  @if (editingId === cat.id) {
+                    <td><input type="text" class="form-control form-control-sm" [(ngModel)]="editName"></td>
+                    <td><input type="text" class="form-control form-control-sm" [(ngModel)]="editDescription" placeholder="Optional"></td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-success" (click)="saveEdit(cat)" [disabled]="editSaving">
+                          {{ editSaving ? '...' : 'Save' }}
+                        </button>
+                        <button class="btn btn-sm btn-outline" (click)="cancelEdit()">Cancel</button>
+                      </div>
+                    </td>
+                  } @else {
+                    <td><strong>{{ cat.name }}</strong></td>
+                    <td class="text-muted">{{ cat.description || '—' }}</td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-warning" (click)="startEdit(cat)">Edit</button>
+                        <button class="btn btn-sm btn-danger" (click)="deleteCategory(cat)">Delete</button>
+                      </div>
+                    </td>
+                  }
                 </tr>
               }
             </tbody>

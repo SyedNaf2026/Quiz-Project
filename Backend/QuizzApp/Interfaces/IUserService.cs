@@ -7,5 +7,6 @@ namespace QuizzApp.Interfaces
         Task<UserProfileDTO?> GetProfileAsync(int userId);
         Task<(bool Success, string Message)> UpdateProfileAsync(int userId, UpdateProfileDTO dto);
         Task<UserStatsDTO> GetUserStatsAsync(int userId);
+        Task<(bool Success, string Message, UpgradeResponseDTO? Data)> UpgradeToPremiumAsync(int userId);
     }
 }

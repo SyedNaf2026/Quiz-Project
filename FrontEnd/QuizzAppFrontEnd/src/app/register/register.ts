@@ -25,8 +25,15 @@ export class Register {
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
-      fullName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      fullName: ['', [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.pattern(/^\S+$/)  // no spaces allowed
+      ]],
+      email: ['', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/)  // must have valid domain
+      ]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['QuizTaker', Validators.required]
     });

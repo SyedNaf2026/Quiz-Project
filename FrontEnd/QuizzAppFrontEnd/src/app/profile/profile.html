@@ -41,11 +41,30 @@
               <div class="profile-detail-label">Role</div>
               <div class="profile-detail-value">
                 <span class="badge"
-                  [class]="role === 'QuizCreator' ? 'badge-info' : role === 'Admin' ? 'badge-danger' : 'badge-success'">
-                  {{ role === 'QuizCreator' ? '🛠️ Quiz Creator' : role === 'QuizTaker' ? '🎯 Quiz Taker' : '👑 Admin' }}
+                  [class]="role === 'QuizCreator' ? 'badge-info' : role === 'Admin' ? 'badge-danger' : role === 'PremiumTaker' ? 'badge-warning' : 'badge-success'">
+                  {{ role === 'QuizCreator' ? '🛠️ Quiz Creator' : role === 'QuizTaker' ? '🎯 Quiz Taker' : role === 'PremiumTaker' ? '⭐ Premium Taker' : role === 'GroupManager' ? '👥 Group Manager' : '👑 Admin' }}
                 </span>
               </div>
             </div>
+
+            <!-- Premium Plan Section -->
+            @if (role === 'QuizTaker') {
+              <div style="margin-top:0.75rem;padding:1rem;background:linear-gradient(135deg,rgba(79,70,229,0.08),rgba(245,158,11,0.08));border:1px solid rgba(245,158,11,0.3);border-radius:8px">
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem">Current Plan</div>
+                <div style="font-weight:600;color:var(--text);margin-bottom:0.5rem">🆓 Free Plan</div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.75rem">Single attempt per quiz</div>
+                <button class="btn btn-warning btn-sm" (click)="openPaymentModal()" style="width:100%">
+                  ⭐ Upgrade to Premium — ₹499
+                </button>
+              </div>
+            }
+            @if (role === 'PremiumTaker') {
+              <div style="margin-top:0.75rem;padding:1rem;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(251,191,36,0.1));border:1px solid rgba(245,158,11,0.4);border-radius:8px">
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem">Current Plan</div>
+                <div style="font-weight:600;color:#f59e0b;margin-bottom:0.25rem">⭐ Premium Plan</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">✅ Unlimited quiz attempts</div>
+              </div>
+            }
           </div>
         </div>
 
@@ -83,8 +102,8 @@
         </div>
       </div>
 
-      <!-- Stats Section (QuizTaker only) -->
-      @if (role === 'QuizTaker' && stats) {
+      <!-- Stats Section (QuizTaker and PremiumTaker) -->
+      @if (isTaker && stats) {
         <div class="card p-3">
           <h3 style="color:var(--text);font-size:1rem;font-weight:600;margin-bottom:1rem">📊 My Stats</h3>
           <div class="grid grid-3" style="gap:1rem">
@@ -130,3 +149,73 @@
     }
   </div>
 </div>
+
+<!-- Payment Modal -->
+@if (showPaymentModal) {
+  <div class="modal-backdrop" (click)="closePaymentModal()">
+    <div style="background:var(--card-bg);border-radius:12px;padding:2rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <div style="font-size:2rem;margin-bottom:0.5rem">⭐</div>
+        <h2 style="color:var(--text);margin:0 0 0.25rem">Upgrade to Premium</h2>
+        <p style="color:var(--text-muted);font-size:0.875rem;margin:0">Unlock unlimited quiz attempts</p>
+      </div>
+
+      <!-- Plan summary -->
+      <div style="background:linear-gradient(135deg,rgba(79,70,229,0.08),rgba(245,158,11,0.08));border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:1rem;margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600;color:var(--text)">Premium Plan</div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">Unlimited attempts · All quizzes</div>
+          </div>
+          <div style="font-size:1.25rem;font-weight:700;color:#f59e0b">₹499</div>
+        </div>
+      </div>
+
+      <!-- Card Form -->
+      <div class="form-group">
+        <label class="form-label">Name on Card</label>
+        <input type="text" class="form-control" [(ngModel)]="cardName" placeholder="Syed Ahmed">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Card Number</label>
+        <input type="text" class="form-control" [value]="cardNumber"
+          (input)="formatCardNumber($event)" placeholder="4242 4242 4242 4242" maxlength="19">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-group">
+          <label class="form-label">Expiry (MM/YY)</label>
+          <input type="text" class="form-control" [(ngModel)]="cardExpiry" placeholder="12/26" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CVV</label>
+          <input type="password" class="form-control" [(ngModel)]="cardCvv" placeholder="•••" maxlength="4">
+        </div>
+      </div>
+
+      @if (paymentError) {
+        <div style="color:#ef4444;font-size:0.825rem;margin-bottom:0.75rem">⚠️ {{ paymentError }}</div>
+      }
+
+      <button class="btn btn-warning w-100 btn-lg" (click)="processPayment()" [disabled]="paymentLoading"
+        style="margin-top:0.5rem">
+        @if (paymentLoading) {
+          <span class="btn-spinner"></span> Processing payment...
+        } @else {
+          🔒 Pay ₹499 — Upgrade Now
+        }
+      </button>
+
+      <button class="btn btn-outline w-100" (click)="closePaymentModal()" style="margin-top:0.75rem" [disabled]="paymentLoading">
+        Cancel
+      </button>
+
+      <p style="text-align:center;font-size:0.72rem;color:var(--text-muted);margin-top:1rem">
+        🔒 This is a simulated payment for demo purposes. No real charges will be made.
+      </p>
+    </div>
+  </div>
+}

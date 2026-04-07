@@ -8,18 +8,12 @@
 
   <div class="nav-links" [class.open]="menuOpen">
 
-    <!-- Admin -->
-    @if (isAdmin()) {
-      <a routerLink="/admin/dashboard" routerLinkActive="active" (click)="menuOpen=false">Dashboard</a>
-      <a routerLink="/admin/users" routerLinkActive="active" (click)="menuOpen=false">Users</a>
-      <a routerLink="/admin/categories" routerLinkActive="active" (click)="menuOpen=false">Categories</a>
-    }
-
     <!-- Creator -->
     @if (isCreator()) {
       <a routerLink="/home" routerLinkActive="active" (click)="menuOpen=false">Home</a>
       <a routerLink="/creator/my-quizzes" routerLinkActive="active" (click)="menuOpen=false">My Quizzes</a>
       <a routerLink="/creator/create-quiz" routerLinkActive="active" (click)="menuOpen=false">Create Quiz</a>
+      <a routerLink="/creator/categories" routerLinkActive="active" (click)="menuOpen=false">Categories</a>
     }
 
     <!-- Group Manager -->
@@ -35,7 +29,6 @@
       <a routerLink="/taker/results" routerLinkActive="active" (click)="menuOpen=false">My Results</a>
       <a routerLink="/taker/leaderboard" routerLinkActive="active" (click)="menuOpen=false">Leaderboard</a>
     }
-
     <a routerLink="/profile" routerLinkActive="active" (click)="menuOpen=false">Profile</a>
   </div>
 
@@ -75,7 +68,7 @@
       </div>
     </div>
 
-    <span class="nav-user">{{ userName }}</span>
+    <span class="nav-user">{{ role === 'PremiumTaker' ? '⭐ ' : '' }}{{ userName }}</span>
     <button class="btn btn-sm btn-outline" (click)="logout()">Logout</button>
   </div>
 </nav>

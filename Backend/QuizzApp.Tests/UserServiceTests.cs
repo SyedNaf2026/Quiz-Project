@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using QuizzApp.Context;
 using QuizzApp.DTOs;
@@ -12,10 +13,22 @@ namespace QuizzApp.Tests
     public class UserServiceTests
     {
         private readonly Mock<IGenericRepository<User>> _userRepoMock;
+        private readonly IConfiguration _configuration;
 
         public UserServiceTests()
         {
             _userRepoMock = new Mock<IGenericRepository<User>>();
+
+            var inMemorySettings = new Dictionary<string, string?>
+            {
+                { "JwtSettings:SecretKey", "TestSecretKey_MustBeAtLeast32Characters!!" },
+                { "JwtSettings:Issuer",    "TestIssuer" },
+                { "JwtSettings:Audience",  "TestAudience" },
+                { "JwtSettings:ExpiryInDays", "7" }
+            };
+            _configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
         }
 
         private AppDbContext CreateDb(string name)
@@ -27,7 +40,7 @@ namespace QuizzApp.Tests
         }
 
         private UserService CreateService(AppDbContext db) =>
-            new UserService(_userRepoMock.Object, db);
+            new UserService(_userRepoMock.Object, db, _configuration);
 
         // ── GetProfile Tests ────────────────────────────────────
 

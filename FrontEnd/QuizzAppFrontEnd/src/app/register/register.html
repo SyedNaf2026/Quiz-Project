@@ -13,7 +13,13 @@
           placeholder="Your full name"
           [class.is-invalid]="f['fullName'].invalid && f['fullName'].touched">
         @if (f['fullName'].invalid && f['fullName'].touched) {
-          <div class="invalid-feedback">Full name is required (min 2 chars).</div>
+          @if (f['fullName'].errors?.['required']) {
+            <div class="invalid-feedback">Full name is required.</div>
+          } @else if (f['fullName'].errors?.['minlength']) {
+            <div class="invalid-feedback">Full name must be at least 2 characters.</div>
+          } @else if (f['fullName'].errors?.['pattern']) {
+            <div class="invalid-feedback">Username must not contain spaces.</div>
+          }
         }
       </div>
 
@@ -23,7 +29,11 @@
           placeholder="you@example.com"
           [class.is-invalid]="f['email'].invalid && f['email'].touched">
         @if (f['email'].invalid && f['email'].touched) {
-          <div class="invalid-feedback">Valid email is required.</div>
+          @if (f['email'].errors?.['required']) {
+            <div class="invalid-feedback">Email is required.</div>
+          } @else if (f['email'].errors?.['pattern']) {
+            <div class="invalid-feedback">Enter a valid email address (e.g. syed@gmail.com).</div>
+          }
         }
       </div>
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse, UpdateProfileDTO, UserProfileDTO, UserStatsDTO } from '../models/models';
+import { ApiResponse, UpdateProfileDTO, UpgradeResponseDTO, UserProfileDTO, UserStatsDTO } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -19,5 +19,9 @@ export class UserService {
 
   getStats(): Observable<ApiResponse<UserStatsDTO>> {
     return this.http.get<ApiResponse<UserStatsDTO>>(`${this.baseUrl}/stats`);
+  }
+
+  upgradeToPremium(): Observable<ApiResponse<UpgradeResponseDTO>> {
+    return this.http.put<ApiResponse<UpgradeResponseDTO>>(`${this.baseUrl}/upgrade-to-premium`, {});
   }
 }

@@ -230,3 +230,10 @@ export interface UserSearchDTO {
   fullName: string;
   email: string;
 }
+
+// ===== Premium Upgrade =====
+export interface UpgradeResponseDTO {
+  token: string;
+  role: string;
+  message: string;
+}

@@ -38,6 +38,18 @@ namespace QuizzApp.Services
             if (quiz == null) return (false, "Quiz not found.", null);
             if (!quiz.IsActive) return (false, "This quiz is not active.", null);
 
+            // Check if normal QuizTaker already attempted this quiz
+            var userRole = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.Role)
+                .FirstOrDefaultAsync();
+
+            var hasAttempted = await _context.QuizResults
+                .AnyAsync(r => r.UserId == userId && r.QuizId == dto.QuizId);
+
+            if (hasAttempted && userRole == "QuizTaker")
+                return (false, "You have already attempted this quiz. Upgrade to Premium for unlimited attempts.", null);
+
             // Delete previous attempt so user can retake
             var existingAttempt = await _resultRepo.FindAsync(r => r.UserId == userId && r.QuizId == dto.QuizId);
             if (existingAttempt.Any())

@@ -95,7 +95,12 @@
               <span>👤 {{ quiz.creatorName }}</span>
             </div>
             <div class="quiz-card-actions">
-              <a [routerLink]="['/taker/take', quiz.id]" class="btn btn-primary btn-sm">Start Quiz</a>
+              @if (isAlreadyAttempted(quiz.id)) {
+                <span class="badge badge-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem" title="Upgrade to Premium for unlimited attempts">🔒 Already Attempted</span>
+                <a routerLink="/profile" class="btn btn-warning btn-sm">⭐ Go Premium</a>
+              } @else {
+                <a [routerLink]="['/taker/take', quiz.id]" class="btn btn-primary btn-sm">Start Quiz</a>
+              }
             </div>
           </div>
         }

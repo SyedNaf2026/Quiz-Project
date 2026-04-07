@@ -16,27 +16,30 @@ namespace QuizzApp.Services
         }
 
         // Get leaderboard by quiz category
-        public async Task<IEnumerable<LeaderboardDTO>> GetLeaderboardAsync(int? categoryId = null)
+        public async Task<IEnumerable<LeaderboardDTO>> GetLeaderboardAsync(int? categoryId = null, DateTime? fromDate = null, DateTime? toDate = null)
         {
-            // Start with all quiz results, including user and quiz data
             var query = _context.QuizResults
                 .Include(r => r.User)
                 .Include(r => r.Quiz)
                     .ThenInclude(q => q!.Category)
                 .AsQueryable();
 
-            // Filter by category if specified
             if (categoryId.HasValue)
                 query = query.Where(r => r.Quiz!.CategoryId == categoryId.Value);
 
-            // Order by highest percentage first
+            // Filter by date range
+            if (fromDate.HasValue)
+                query = query.Where(r => r.CompletedAt >= fromDate.Value);
+
+            if (toDate.HasValue)
+                query = query.Where(r => r.CompletedAt <= toDate.Value);
+
             var results = await query
                 .OrderByDescending(r => r.Percentage)
                 .ThenByDescending(r => r.Score)
-                .Take(50) 
+                .Take(50)
                 .ToListAsync();
 
-            // Add rank numbers and map to DTO
             int rank = 1;
             return results.Select(r => new LeaderboardDTO
             {

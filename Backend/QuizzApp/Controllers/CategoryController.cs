@@ -39,5 +39,22 @@ namespace QuizzApp.Controllers
             var result = await _categoryService.CreateCategoryAsync(dto);
             return Ok(ApiResponse<CategoryDTO>.Ok(result, "Category created successfully."));
         }
+        // PUT api/category/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CreateCategoryDTO dto)
+        {
+            var (success, message, data) = await _categoryService.UpdateCategoryAsync(id, dto);
+            if (!success) return BadRequest(ApiResponse<CategoryDTO>.Fail(message));
+            return Ok(ApiResponse<CategoryDTO>.Ok(data!, message));
+        }
+
+        // DELETE api/category/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var (success, message) = await _categoryService.DeleteCategoryAsync(id);
+            if (!success) return BadRequest(ApiResponse<string>.Fail(message));
+            return Ok(ApiResponse<string>.Ok(message));
+        }
     }
 }

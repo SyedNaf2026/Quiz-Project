@@ -5,6 +5,7 @@ import { Navbar } from '../../navbar/navbar';
 import { QuizService } from '../../service/quiz.service';
 import { CategoryService } from '../../service/category.service';
 import { GroupService } from '../../service/group.service';
+import { QuizAttemptService } from '../../service/quiz-attempt.service';
 import { ToastService } from '../../service/toast.service';
 import { CategoryDTO, QuizDTO, GroupQuizDTO } from '../../models/models';
 
@@ -22,6 +23,8 @@ export class BrowseQuizzes implements OnInit {
   availableDifficulties: string[] = [];
   groupQuizzes: GroupQuizDTO[] = [];
   completedGroupQuizIds: number[] = [];
+  attemptedQuizIds: number[] = [];
+  role = localStorage.getItem('user-role') || '';
 
   loading = true;
   search = '';
@@ -39,6 +42,7 @@ export class BrowseQuizzes implements OnInit {
     private quizService: QuizService,
     private categoryService: CategoryService,
     private groupService: GroupService,
+    private attemptService: QuizAttemptService,
     private toast: ToastService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -70,18 +74,32 @@ export class BrowseQuizzes implements OnInit {
       next: res => { this.completedGroupQuizIds = res.data || []; this.cdr.detectChanges(); },
       error: () => {}
     });
+
+    // Load attempted quiz IDs for normal QuizTaker (to show Already Attempted)
+    if (this.role === 'QuizTaker') {
+      this.attemptService.getMyResults().subscribe({
+        next: res => {
+          this.attemptedQuizIds = (res.data || []).map(r => r.quizId);
+          this.cdr.detectChanges();
+        },
+        error: () => {}
+      });
+    }
   }
 
   applyFilter(): void {
     const q = this.search.toLowerCase();
+
+    // Exclude quizzes already assigned via group — they show in the group section above
+    const groupQuizIdSet = new Set(this.groupQuizzes.map(gq => gq.quizId));
 
     // Filter by category name
     const catName = this.selectedCategoryId
       ? (this.categories.find(c => c.id === this.selectedCategoryId)?.name ?? '')
       : '';
     let result = catName
-      ? this.allQuizzes.filter(x => x.categoryName === catName)
-      : [...this.allQuizzes];
+      ? this.allQuizzes.filter(x => x.categoryName === catName && !groupQuizIdSet.has(x.id))
+      : this.allQuizzes.filter(x => !groupQuizIdSet.has(x.id));
 
     // Build difficulty options from current category result
     const found = result.map(x => x.difficulty ?? '').filter(d => d !== '');
@@ -144,5 +162,9 @@ export class BrowseQuizzes implements OnInit {
 
   isGroupQuizDone(quizId: number): boolean {
     return this.completedGroupQuizIds.includes(quizId);
+  }
+
+  isAlreadyAttempted(quizId: number): boolean {
+    return this.role === 'QuizTaker' && this.attemptedQuizIds.includes(quizId);
   }
 }

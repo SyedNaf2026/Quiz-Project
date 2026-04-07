@@ -113,9 +113,8 @@ export class Navbar implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
-  isAdmin() { return this.role === 'Admin'; }
   isCreator() { return this.role === 'QuizCreator'; }
-  isTaker() { return this.role === 'QuizTaker'; }
+  isTaker() { return this.role === 'QuizTaker' || this.role === 'PremiumTaker'; }
   isGroupManager() { return this.role === 'GroupManager'; }
 
   ngOnDestroy(): void {

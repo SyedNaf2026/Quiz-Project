@@ -24,4 +24,11 @@ namespace QuizzApp.DTOs
         public double BestScore { get; set; }
         public int TotalQuizzesTaken { get; set; }
     }
+
+    public class UpgradeResponseDTO
+    {
+        public string Token { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+    }
 }

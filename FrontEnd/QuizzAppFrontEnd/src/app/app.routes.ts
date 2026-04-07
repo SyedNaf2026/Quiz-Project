@@ -16,17 +16,7 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // Admin routes
-  {
-    path: 'admin',
-    canActivate: [authGuard, roleGuard(['Admin'])],
-    children: [
-      { path: 'dashboard', loadComponent: () => import('./admin/dashboard/admin-dashboard').then(m => m.AdminDashboard) },
-      { path: 'categories', loadComponent: () => import('./admin/categories/admin-categories').then(m => m.AdminCategories) },
-      { path: 'users', loadComponent: () => import('./admin/users/admin-users').then(m => m.AdminUsers) },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-    ]
-  },
+  // Admin routes — removed (not required)
 
   // Creator routes
   {
@@ -37,6 +27,7 @@ export const routes: Routes = [
       { path: 'create-quiz', loadComponent: () => import('./creator/create-quiz/create-quiz').then(m => m.CreateQuiz) },
       { path: 'edit-quiz/:id', loadComponent: () => import('./creator/create-quiz/create-quiz').then(m => m.CreateQuiz) },
       { path: 'quiz/:id/questions', loadComponent: () => import('./creator/quiz-questions/quiz-questions').then(m => m.QuizQuestions) },
+      { path: 'categories', loadComponent: () => import('./admin/categories/admin-categories').then(m => m.AdminCategories) },
       { path: '', redirectTo: 'my-quizzes', pathMatch: 'full' }
     ]
   },
@@ -44,7 +35,7 @@ export const routes: Routes = [
   // Taker routes
   {
     path: 'taker',
-    canActivate: [authGuard, roleGuard(['QuizTaker'])],
+    canActivate: [authGuard, roleGuard(['QuizTaker', 'PremiumTaker'])],
     children: [
       { path: 'browse', loadComponent: () => import('./taker/browse/browse-quizzes').then(m => m.BrowseQuizzes) },
       { path: 'take/:id', loadComponent: () => import('./taker/take-quiz/take-quiz').then(m => m.TakeQuiz) },

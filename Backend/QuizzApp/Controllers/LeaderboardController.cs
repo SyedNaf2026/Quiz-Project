@@ -18,12 +18,16 @@ namespace QuizzApp.Controllers
             _leaderboardService = leaderboardService;
         }
 
-        // GET api/leaderboard?categoryId=1
-        // Get top scorers (optionally filtered by quiz category)
+        // GET api/leaderboard?categoryId=1&fromDate=2025-01-01&toDate=2025-12-31
         [HttpGet]
-        public async Task<IActionResult> GetLeaderboard([FromQuery] int? categoryId = null)
+        public async Task<IActionResult> GetLeaderboard(
+            [FromQuery] int? categoryId = null,
+            [FromQuery] DateTime? fromDate = null,
+            [FromQuery] DateTime? toDate = null)
         {
-            var leaderboard = await _leaderboardService.GetLeaderboardAsync(categoryId);
+            // If toDate provided, include the full end day
+            var adjustedToDate = toDate.HasValue ? toDate.Value.Date.AddDays(1).AddTicks(-1) : (DateTime?)null;
+            var leaderboard = await _leaderboardService.GetLeaderboardAsync(categoryId, fromDate, adjustedToDate);
             return Ok(ApiResponse<IEnumerable<LeaderboardDTO>>.Ok(leaderboard));
         }
     }

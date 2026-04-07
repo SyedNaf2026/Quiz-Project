@@ -35,8 +35,6 @@ namespace QuizzApp.Services
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
         {
             var categories = await _categoryRepo.GetAllAsync();
-
-            // Manually map each category to a DTO
             return categories.Select(c => new CategoryDTO
             {
                 Id = c.Id,
@@ -45,5 +43,33 @@ namespace QuizzApp.Services
             });
         }
 
+        public async Task<(bool Success, string Message, CategoryDTO? Data)> UpdateCategoryAsync(int id, CreateCategoryDTO dto)
+        {
+            var category = await _categoryRepo.GetByIdAsync(id);
+            if (category == null) return (false, "Category not found.", null);
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return (false, "Category name is required.", null);
+
+            category.Name = dto.Name;
+            category.Description = dto.Description;
+            await _categoryRepo.UpdateAsync(category);
+
+            return (true, "Category updated.", new CategoryDTO
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description
+            });
+        }
+
+        public async Task<(bool Success, string Message)> DeleteCategoryAsync(int id)
+        {
+            var category = await _categoryRepo.GetByIdAsync(id);
+            if (category == null) return (false, "Category not found.");
+
+            await _categoryRepo.DeleteAsync(category);
+            return (true, "Category deleted.");
+        }
     }
 }

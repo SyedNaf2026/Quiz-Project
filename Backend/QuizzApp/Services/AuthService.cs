@@ -22,8 +22,8 @@ namespace QuizzApp.Services
 
         public async Task<(bool Success, string Message, AuthResponseDTO? Data)> RegisterAsync(RegisterDTO dto)
         {
-            if (dto.Role != "QuizTaker" && dto.Role != "QuizCreator" && dto.Role != "GroupManager")
-                return (false, "Role must be 'QuizTaker', 'QuizCreator', or 'GroupManager'.", null);
+            if (dto.Role != "QuizTaker" && dto.Role != "QuizCreator" && dto.Role != "GroupManager" && dto.Role != "PremiumTaker")
+                return (false, "Role must be 'QuizTaker', 'QuizCreator', 'GroupManager', or 'PremiumTaker'.", null);
 
             // Check if email is already taken
             var existingUsers = await _userRepo.FindAsync(u => u.Email == dto.Email);

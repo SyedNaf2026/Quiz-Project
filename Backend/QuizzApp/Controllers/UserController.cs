@@ -62,5 +62,13 @@ namespace QuizzApp.Controllers
 
             return Ok(ApiResponse<string>.Ok("Profile updated.", message));
         }
+        // PUT api/user/upgrade-to-premium
+        [HttpPut("upgrade-to-premium")]
+        public async Task<IActionResult> UpgradeToPremium()
+        {
+            var (success, message, data) = await _userService.UpgradeToPremiumAsync(GetUserId());
+            if (!success) return BadRequest(ApiResponse<UpgradeResponseDTO>.Fail(message));
+            return Ok(ApiResponse<UpgradeResponseDTO>.Ok(data!, message));
+        }
     }
 }

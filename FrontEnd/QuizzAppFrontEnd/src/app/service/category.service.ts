@@ -16,4 +16,12 @@ export class CategoryService {
   createCategory(data: CreateCategoryDTO): Observable<ApiResponse<CategoryDTO>> {
     return this.http.post<ApiResponse<CategoryDTO>>(this.baseUrl, data);
   }
+
+  updateCategory(id: number, data: CreateCategoryDTO): Observable<ApiResponse<CategoryDTO>> {
+    return this.http.put<ApiResponse<CategoryDTO>>(`${this.baseUrl}/${id}`, data);
+  }
+
+  deleteCategory(id: number): Observable<ApiResponse<string>> {
+    return this.http.delete<ApiResponse<string>>(`${this.baseUrl}/${id}`);
+  }
 }
