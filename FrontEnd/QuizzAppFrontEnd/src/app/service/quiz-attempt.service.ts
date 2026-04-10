@@ -16,4 +16,8 @@ export class QuizAttemptService {
   getMyResults(): Observable<ApiResponse<QuizResultDTO[]>> {
     return this.http.get<ApiResponse<QuizResultDTO[]>>(`${this.baseUrl}/my-results`);
   }
+
+  reviewResult(quizId: number): Observable<ApiResponse<QuizResultDTO>> {
+    return this.http.get<ApiResponse<QuizResultDTO>>(`${this.baseUrl}/review/${quizId}`);
+  }
 }

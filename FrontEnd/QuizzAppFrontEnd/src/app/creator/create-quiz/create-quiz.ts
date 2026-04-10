@@ -96,7 +96,7 @@ export class CreateQuiz implements OnInit {
       next: (res) => {
         this.savingCategory = false;
         if (res.success && res.data) {
-          this.categories = [...this.categories, res.data];
+          this.categories = [res.data, ...this.categories];
           this.form.patchValue({ categoryId: res.data.id });
           this.showNewCategory = false;
           this.newCategoryName = '';

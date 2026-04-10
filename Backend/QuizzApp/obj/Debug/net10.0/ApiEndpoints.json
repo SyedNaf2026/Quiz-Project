@@ -679,6 +679,22 @@
   },
   {
     "ContainingType": "QuizzApp.Controllers.QuizAttemptController",
+    "Method": "ReviewResult",
+    "RelativePath": "api/QuizAttempt/review/{quizId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "quizId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.QuizAttemptController",
     "Method": "Submit",
     "RelativePath": "api/QuizAttempt/submit",
     "HttpMethod": "POST",

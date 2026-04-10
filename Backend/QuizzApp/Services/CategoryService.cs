@@ -1,17 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+using QuizzApp.Context;
 using QuizzApp.DTOs;
 using QuizzApp.Interfaces;
 using QuizzApp.Models;
 
 namespace QuizzApp.Services
 {
-    // CategoryService handles creating and listing quiz categories
     public class CategoryService : ICategoryService
     {
         private readonly IGenericRepository<Category> _categoryRepo;
+        private readonly AppDbContext _context;
 
-        public CategoryService(IGenericRepository<Category> categoryRepo)
+        public CategoryService(IGenericRepository<Category> categoryRepo, AppDbContext context)
         {
             _categoryRepo = categoryRepo;
+            _context = context;
         }
 
         public async Task<CategoryDTO> CreateCategoryAsync(CreateCategoryDTO dto)
@@ -67,6 +70,10 @@ namespace QuizzApp.Services
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null) return (false, "Category not found.");
+
+            // Check if any quizzes are using this category
+            var inUse = await _context.Quizzes.AnyAsync(q => q.CategoryId == id);
+            if (inUse) return (false, "Cannot delete — this category is used by one or more quizzes.");
 
             await _categoryRepo.DeleteAsync(category);
             return (true, "Category deleted.");

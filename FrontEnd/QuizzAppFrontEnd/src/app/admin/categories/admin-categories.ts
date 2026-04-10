@@ -123,7 +123,7 @@ export class AdminCategories implements OnInit {
         if (res.success) { this.toast.success('Category deleted.'); this.load(); }
         else this.toast.error(res.message);
       },
-      error: () => this.toast.error('Failed to delete. Category may be in use by quizzes.')
+      error: () => this.toast.error('Cannot delete — this category is in use by quizzes.')
     });
   }
 }

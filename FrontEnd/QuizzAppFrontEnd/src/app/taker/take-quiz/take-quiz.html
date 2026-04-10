@@ -58,7 +58,7 @@
                   @for (t of a.selectedOptionTexts; track t) {
                     <span [class]="a.isCorrect ? 'badge badge-success' : 'badge badge-danger'" style="margin-right:2px">{{ t }}</span>
                   }
-                  @if (!a.selectedOptionTexts?.length) {
+                  @if (!a.selectedOptionTexts.length) {
                     <span class="badge badge-secondary">Not answered</span>
                   }
                 </p>
@@ -273,9 +273,43 @@
                 <button class="btn btn-sm btn-warning skip-btn" (click)="skipQuestion()">
                   ⏭ Skip
                 </button>
-                <button class="btn btn-sm btn-outline" (click)="goToQuestion(currentIndex + 1)"
-                  [disabled]="currentIndex === questions.length - 1">Next →</button>
+                @if (currentIndex < questions.length - 1) {
+                  <button class="btn btn-sm btn-primary" (click)="goToQuestion(currentIndex + 1)">
+                    Next →
+                  </button>
+                } @else {
+                  <span style="min-width:70px"></span>
+                }
               </div>
+            </div>
+
+            <!-- Submit button — only shown on last question -->
+            @if (currentIndex === questions.length - 1) {
+              <div style="text-align:center;margin-top:1.5rem;margin-bottom:1rem">
+                <button class="btn btn-success btn-lg" (click)="submit()" [disabled]="submitting"
+                  style="min-width:220px;font-size:1rem;padding:0.75rem 2rem">
+                  @if (submitting) { <span class="btn-spinner"></span> }
+                  {{ submitting ? 'Submitting...' : '✅ Submit Quiz' }}
+                </button>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem">
+                  {{ answeredCount }}/{{ questions.length }} answered
+                </p>
+              </div>
+            }
+          }
+
+          <!-- After submit: answer review with countdown -->
+          @if (submitted && showAnswerReview && result) {
+            <div class="card p-3 mb-2" style="text-align:center;border:2px solid var(--primary)">
+              <div style="font-size:1.5rem;margin-bottom:0.5rem">
+                {{ result.percentage >= 70 ? '🎉' : result.percentage >= 40 ? '👍' : '😔' }}
+              </div>
+              <p style="font-weight:600;color:var(--text);margin-bottom:0.25rem">
+                Quiz submitted! Showing results in {{ reviewCountdown }}s...
+              </p>
+              <p style="color:var(--text-muted);font-size:0.85rem">
+                Score: {{ result.score }}/{{ result.totalQuestions }} ({{ result.percentage | number:'1.0-0' }}%)
+              </p>
             </div>
           }
 
@@ -325,22 +359,16 @@
             }
           }
 
-          <!-- Submit / Done row -->
-          <div class="d-flex justify-between align-center mt-3 mb-3">
-            @if (!submitted) {
-              <p class="text-muted fs-sm mb-0">{{ questions.length - answeredCount }} question(s) remaining</p>
-              <button class="btn btn-success btn-lg" (click)="submit()" [disabled]="submitting">
-                @if (submitting) { <span class="btn-spinner"></span> }
-                {{ submitting ? 'Submitting...' : 'Submit Quiz' }}
-              </button>
-            } @else {
+          <!-- Done row -->
+          @if (submitted) {
+            <div class="d-flex justify-between align-center mt-3 mb-3">
               <p class="text-muted fs-sm mb-0">Scroll up to see your score summary</p>
               <div class="d-flex gap-1">
                 <a routerLink="/taker/browse" class="btn btn-primary">Browse Quizzes</a>
                 <a routerLink="/taker/results" class="btn btn-outline">My Results</a>
               </div>
-            }
-          </div>
+            </div>
+          }
 
         </div><!-- /quiz-main -->
       </div><!-- /quiz-layout -->

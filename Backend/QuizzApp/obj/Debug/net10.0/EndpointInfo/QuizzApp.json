@@ -1093,6 +1093,29 @@
         }
       }
     },
+    "/api/QuizAttempt/review/{quizId}": {
+      "get": {
+        "tags": [
+          "QuizAttempt"
+        ],
+        "parameters": [
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/User/profile": {
       "get": {
         "tags": [

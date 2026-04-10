@@ -12,6 +12,7 @@ import { CategoryDTO, LeaderboardDTO } from '../../models/models';
   standalone: true,
   imports: [CommonModule, FormsModule, Navbar],
   templateUrl: './leaderboard.html'
+  
 })
 export class Leaderboard implements OnInit {
   entries: LeaderboardDTO[] = [];
@@ -19,17 +20,17 @@ export class Leaderboard implements OnInit {
   loading = true;
 
   selectedCategoryId: number | undefined;
-  selectedPeriod = 'all';  // all | today | week | month | year | custom
+  selectedPeriod = 'all';
   customFrom = '';
   customTo = '';
 
   periods = [
-    { value: 'all',   label: 'All Time' },
-    { value: 'today', label: 'Today' },
-    { value: 'week',  label: 'This Week' },
-    { value: 'month', label: 'This Month' },
-    { value: 'year',  label: 'This Year' },
-    { value: 'custom',label: 'Custom Range' }
+    { value: 'all',    label: 'All Time' },
+    { value: 'today',  label: 'Today' },
+    { value: 'week',   label: 'This Week' },
+    { value: 'month',  label: 'This Month' },
+    { value: 'year',   label: 'This Year' },
+    { value: 'custom', label: 'Custom Range' }
   ];
 
   constructor(
@@ -48,14 +49,14 @@ export class Leaderboard implements OnInit {
 
   getDateRange(): { from?: string; to?: string } {
     const now = new Date();
-    const fmt = (d: Date) => d.toISOString().split('T')[0]; // YYYY-MM-DD
+    const fmt = (d: Date) => d.toISOString().split('T')[0];
 
     switch (this.selectedPeriod) {
       case 'today':
         return { from: fmt(now), to: fmt(now) };
       case 'week': {
         const start = new Date(now);
-        start.setDate(now.getDate() - now.getDay()); // Sunday
+        start.setDate(now.getDate() - now.getDay());
         return { from: fmt(start), to: fmt(now) };
       }
       case 'month':

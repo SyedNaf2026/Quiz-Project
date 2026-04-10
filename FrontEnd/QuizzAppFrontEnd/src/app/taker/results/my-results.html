@@ -20,7 +20,7 @@
     @if (activeTab === 'individual') {
       @if (loading) {
         @for (i of [1,2,3]; track i) {
-          <div class="skeleton mb-2" style="height:80px; border-radius:8px"></div>
+          <div class="skeleton mb-2" style="height:80px;border-radius:8px"></div>
         }
       } @else if (results.length === 0) {
         <div class="empty-state">
@@ -63,7 +63,7 @@
                   <th>Score</th>
                   <th>Percentage</th>
                   <th>Date</th>
-                  <th>Certificate</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -79,9 +79,53 @@
                     </td>
                     <td style="color:var(--text)">{{ r.completedAt | date:'mediumDate' }}</td>
                     <td>
-                      <button class="btn btn-sm btn-warning" (click)="openCertificate(r)">🏅 Certificate</button>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-warning" (click)="openCertificate(r)">🏅 Certificate</button>
+                        <button class="btn btn-sm btn-outline" (click)="toggleReview(r)">
+                          {{ reviewingQuizId === r.quizId ? '▲ Hide' : '📖 Review' }}
+                        </button>
+                      </div>
                     </td>
                   </tr>
+                  <!-- Inline review panel -->
+                  @if (reviewingQuizId === r.quizId) {
+                    <tr>
+                      <td colspan="6" style="padding:0">
+                        <div style="background:var(--bg);padding:1rem;border-top:1px solid var(--border)">
+                          @if (reviewLoading) {
+                            <p class="text-muted">Loading review...</p>
+                          } @else if (reviewResult) {
+                            @if (reviewResult.answerBreakdown.every(a => a.isCorrect)) {
+                              <p style="color:#10b981;font-weight:600">🎉 Perfect score! All answers were correct.</p>
+                            } @else {
+                              <p style="font-weight:600;color:var(--text);margin-bottom:0.75rem">
+                                ❌ {{ reviewResult.answerBreakdown.filter(a => !a.isCorrect).length }} wrong answer(s) to review:
+                              </p>
+                              @for (a of reviewResult.answerBreakdown; track a.questionId) {
+                                @if (!a.isCorrect) {
+                                  <div style="background:var(--card-bg);border:1px solid var(--border);border-left:4px solid #ef4444;border-radius:8px;padding:0.75rem;margin-bottom:0.5rem">
+                                    <p style="font-weight:600;color:var(--text);margin:0 0 0.4rem">{{ a.questionText }}</p>
+                                    <p style="margin:0 0 0.25rem;font-size:0.85rem">
+                                      <span style="color:#ef4444">❌ Your answer: </span>
+                                      <span style="color:var(--text)">
+                                        {{ a.questionType === 'MultipleAnswer' ? (a.selectedOptionTexts.length ? a.selectedOptionTexts.join(', ') : 'Not answered') : (a.selectedOptionText || 'Not answered') }}
+                                      </span>
+                                    </p>
+                                    <p style="margin:0;font-size:0.85rem">
+                                      <span style="color:#10b981">✅ Correct answer: </span>
+                                      <span style="color:var(--text)">
+                                        {{ a.questionType === 'MultipleAnswer' ? a.correctOptionTexts.join(', ') : a.correctOptionText }}
+                                      </span>
+                                    </p>
+                                  </div>
+                                }
+                              }
+                            }
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
                 }
               </tbody>
             </table>
@@ -148,51 +192,7 @@
   </div>
 </div>
 
-<!-- Certificate Preview Modal -->
-@if (showCertModal && selectedResult) {
-  <div class="modal-backdrop" (click)="closeCertificate()">
-    <div style="background:#fff;border-radius:12px;padding:2rem;max-width:780px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.4)" (click)="$event.stopPropagation()">
-
-      <!-- Certificate Preview -->
-      <div style="background:#fdfaf5;border:2px solid #c9a84c;position:relative;padding:40px 60px;text-align:center;font-family:Georgia,serif;margin-bottom:1.5rem">
-        <div style="position:absolute;inset:8px;border:1px solid #c9a84c;pointer-events:none"></div>
-        <div style="position:absolute;inset:16px;border:1px solid rgba(201,168,76,0.3);pointer-events:none"></div>
-
-        <div style="font-size:2rem;font-weight:700;color:#1a2a4a;letter-spacing:1px;margin-bottom:4px">Certificate of Completion</div>
-        <div style="color:#c9a84c;font-size:1rem;margin-bottom:20px;letter-spacing:6px">✦ ✦ ✦</div>
-        <div style="font-size:0.75rem;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:6px">This Certificate is Proudly Presented to</div>
-        <div style="font-size:1.6rem;font-weight:700;color:#1a2a4a;border-bottom:2px solid #c9a84c;padding-bottom:4px;margin-bottom:12px;display:inline-block;min-width:300px">{{ certUserName }}</div>
-        <div style="font-size:0.9rem;color:#444;margin-bottom:4px">For successfully completing the quiz</div>
-        <div style="font-size:1rem;font-weight:700;color:#1a2a4a;margin-bottom:4px">"{{ selectedResult.quizTitle }}"</div>
-        <div style="font-size:0.85rem;color:#666;margin-bottom:24px">
-          Score: <strong style="color:#c9a84c">{{ selectedResult.score }} / {{ selectedResult.totalQuestions }}</strong>
-          &nbsp;|&nbsp;
-          Percentage: <strong style="color:#c9a84c">{{ selectedResult.percentage | number:'1.0-0' }}%</strong>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;margin-top:auto;padding-top:16px">
-          <div style="text-align:center;min-width:160px">
-            <div style="font-size:0.85rem;color:#333;margin-bottom:4px">{{ certDate }}</div>
-            <div style="border-top:1px solid #999;padding-top:4px;font-size:0.7rem;color:#777;letter-spacing:1px;text-transform:uppercase">Date</div>
-          </div>
-          <div></div>
-          <div style="text-align:center;min-width:160px">
-            <div style="font-size:1.2rem;color:#c9a84c;font-weight:700;margin-bottom:4px">QuizApp</div>
-            <div style="border-top:1px solid #999;padding-top:4px;font-size:0.7rem;color:#777;letter-spacing:1px;text-transform:uppercase">Issued By</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="d-flex gap-1 justify-center">
-        <button class="btn btn-warning" (click)="downloadCertificate(selectedResult)">⬇️ Download Certificate</button>
-        <button class="btn btn-outline" (click)="closeCertificate()" style="color:#333;border-color:#999">✕ Close</button>
-      </div>
-    </div>
-  </div>
-}
-
-<!-- Certificate Preview Modal -->
+<!-- Certificate Modal -->
 @if (showCertModal && selectedResult) {
   <div class="modal-backdrop" (click)="closeCertificate()">
     <div style="background:#fff;border-radius:12px;padding:2rem;max-width:780px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.4)" (click)="$event.stopPropagation()">
@@ -210,7 +210,7 @@
           &nbsp;|&nbsp;
           Percentage: <strong style="color:#c9a84c">{{ selectedResult.percentage | number:'1.0-0' }}%</strong>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:auto;padding-top:16px">
+        <div style="display:flex;justify-content:space-between;padding-top:16px">
           <div style="text-align:center;min-width:160px">
             <div style="font-size:0.85rem;color:#333;margin-bottom:4px">{{ certDate }}</div>
             <div style="border-top:1px solid #999;padding-top:4px;font-size:0.7rem;color:#777;letter-spacing:1px;text-transform:uppercase">Date</div>

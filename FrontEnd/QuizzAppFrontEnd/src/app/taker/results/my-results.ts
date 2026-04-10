@@ -23,6 +23,11 @@ export class MyResults implements OnInit {
   showCertModal = false;
   activeTab: 'individual' | 'group' = 'individual';
 
+  // Review wrong answers
+  reviewingQuizId: number | null = null;
+  reviewResult: QuizResultDTO | null = null;
+  reviewLoading = false;
+
   constructor(
     private attemptService: QuizAttemptService,
     private groupService: GroupService,
@@ -65,6 +70,25 @@ export class MyResults implements OnInit {
   closeCertificate(): void {
     this.showCertModal = false;
     this.selectedResult = null;
+  }
+
+  toggleReview(r: QuizResultDTO): void {
+    if (this.reviewingQuizId === r.quizId) {
+      this.reviewingQuizId = null;
+      this.reviewResult = null;
+      return;
+    }
+    this.reviewingQuizId = r.quizId;
+    this.reviewLoading = true;
+    this.cdr.detectChanges();
+    this.attemptService.reviewResult(r.quizId).subscribe({
+      next: res => {
+        this.reviewResult = res.data;
+        this.reviewLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.reviewLoading = false; this.toast.error('Failed to load review.'); }
+    });
   }
 
   downloadCertificate(r: QuizResultDTO): void {

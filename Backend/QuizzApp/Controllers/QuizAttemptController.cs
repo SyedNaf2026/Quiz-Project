@@ -6,10 +6,8 @@ using QuizzApp.Interfaces;
 
 namespace QuizzApp.Controllers
 {
-    // QuizAttemptController lets QuizTakers take quizzes and see their results
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles = "QuizTaker")]
     public class QuizAttemptController : ControllerBase
     {
         private readonly IQuizAttemptService _attemptService;
@@ -26,25 +24,30 @@ namespace QuizzApp.Controllers
         }
 
         // POST api/quizattempt/submit
-        // Submit answers for a quiz - score is calculated automatically
         [HttpPost("submit")]
         public async Task<IActionResult> Submit([FromBody] SubmitQuizDTO dto)
         {
             var (success, message, data) = await _attemptService.SubmitQuizAsync(dto, GetUserId());
-
-            if (!success)
-                return BadRequest(ApiResponse<QuizResultDTO>.Fail(message));
-
+            if (!success) return BadRequest(ApiResponse<QuizResultDTO>.Fail(message));
             return Ok(ApiResponse<QuizResultDTO>.Ok(data!, message));
         }
 
         // GET api/quizattempt/my-results
-        // Get all quiz results for the logged-in user
         [HttpGet("my-results")]
         public async Task<IActionResult> GetMyResults()
         {
             var results = await _attemptService.GetUserResultsAsync(GetUserId());
             return Ok(ApiResponse<IEnumerable<QuizResultDTO>>.Ok(results));
+        }
+
+        // GET api/quizattempt/review/{quizId}
+        // Returns full result with answer breakdown for review
+        [HttpGet("review/{quizId}")]
+        public async Task<IActionResult> ReviewResult(int quizId)
+        {
+            var result = await _attemptService.GetResultByQuizAsync(quizId, GetUserId());
+            if (result == null) return NotFound(ApiResponse<QuizResultDTO>.Fail("Result not found."));
+            return Ok(ApiResponse<QuizResultDTO>.Ok(result));
         }
     }
 }

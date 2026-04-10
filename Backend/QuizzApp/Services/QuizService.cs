@@ -99,6 +99,34 @@ namespace QuizzApp.Services
             if (quiz == null) return (false, "Quiz not found.");
             if (quiz.CreatedBy != userId) return (false, "You can only delete your own quizzes.");
 
+            // Remove GroupQuizResults → GroupQuizzes → QuizResults → UserAnswers first
+            var groupQuizIds = await _context.GroupQuizzes
+                .Where(gq => gq.QuizId == quizId)
+                .Select(gq => gq.Id)
+                .ToListAsync();
+
+            if (groupQuizIds.Any())
+            {
+                var groupQuizResults = await _context.GroupQuizResults
+                    .Where(gr => groupQuizIds.Contains(gr.GroupQuizId))
+                    .ToListAsync();
+                _context.GroupQuizResults.RemoveRange(groupQuizResults);
+
+                var groupQuizzes = await _context.GroupQuizzes
+                    .Where(gq => gq.QuizId == quizId).ToListAsync();
+                _context.GroupQuizzes.RemoveRange(groupQuizzes);
+            }
+
+            var quizResults = await _context.QuizResults
+                .Where(r => r.QuizId == quizId).ToListAsync();
+            _context.QuizResults.RemoveRange(quizResults);
+
+            var userAnswers = await _context.UserAnswers
+                .Where(a => a.QuizId == quizId).ToListAsync();
+            _context.UserAnswers.RemoveRange(userAnswers);
+
+            await _context.SaveChangesAsync();
+
             await _quizRepo.DeleteAsync(quiz);
             return (true, "Quiz deleted successfully.");
         }

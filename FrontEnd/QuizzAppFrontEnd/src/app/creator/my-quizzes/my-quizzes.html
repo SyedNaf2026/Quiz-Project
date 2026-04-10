@@ -37,8 +37,9 @@
             <div class="quiz-card-actions">
               <a [routerLink]="['/creator/quiz', quiz.id, 'questions']" class="btn btn-sm btn-info">Questions</a>
               <a [routerLink]="['/creator/edit-quiz', quiz.id]" class="btn btn-sm btn-warning">Edit</a>
-              <button class="btn btn-sm btn-outline" (click)="toggle(quiz)">
-                {{ quiz.isActive ? 'Deactivate' : 'Activate' }}
+              <button class="btn btn-sm" (click)="toggle(quiz)"
+                [class]="quiz.isActive ? 'btn-danger' : 'btn-success'">
+                {{ quiz.isActive ? '🔴 Deactivate' : '🟢 Activate' }}
               </button>
               <button class="btn btn-sm btn-danger" (click)="confirmDelete(quiz)">Delete</button>
             </div>

@@ -45,6 +45,7 @@ export class MyQuizzes implements OnInit {
   }
 
   toggle(quiz: QuizDTO): void {
+    if (quiz.isActive && !confirm(`Deactivate "${quiz.title}"? QuizTakers will no longer see this quiz.`)) return;
     this.quizService.toggleStatus(quiz.id).subscribe({
       next: () => { setTimeout(() => this.toast.success('Status updated.'), 0); this.load(); },
       error: () => setTimeout(() => this.toast.error('Failed to toggle status.'), 0)

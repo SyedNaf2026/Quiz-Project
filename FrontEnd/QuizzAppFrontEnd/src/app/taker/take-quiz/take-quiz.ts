@@ -29,6 +29,8 @@ export class TakeQuiz implements OnInit, OnDestroy {
   quizStarted = false;
   result: QuizResultDTO | null = null;
   showResult = false;
+  showAnswerReview = false;
+  reviewCountdown = 3;
   timeLeft = 0;
   private timerInterval: any = null;
   private warnedAt30 = false;
@@ -104,7 +106,7 @@ export class TakeQuiz implements OnInit, OnDestroy {
       if (this.timeLeft === 10 && !this.warnedAt10) { this.warnedAt10 = true; this.toast.error('🚨 10 seconds left — hurry!'); }
       if (this.timeLeft <= 0) {
         clearInterval(this.timerInterval); this.timerInterval = null;
-        this.toast.error('⏰ Time is up! Auto-submitting...'); this.submit();
+        this.toast.error('⏰ Time is up! Auto-submitting...'); this.submit(true);
       }
     }, 1000);
   }
@@ -240,8 +242,13 @@ export class TakeQuiz implements OnInit, OnDestroy {
     if (win) { win.document.write(html); win.document.close(); }
   }
 
-  submit(): void {
+  submit(autoSubmit = false): void {
     if (!this.quiz || this.submitting || this.submitted) return;
+    // Ask confirmation only when manually submitted, not auto-submit
+    if (!autoSubmit && this.answeredCount < this.questions.length) {
+      const unanswered = this.questions.length - this.answeredCount;
+      if (!confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to submit?`)) return;
+    }
     if (this.timerInterval) { clearInterval(this.timerInterval); this.timerInterval = null; }
     this.submitting = true;
     this.cdr.detectChanges();
@@ -257,8 +264,20 @@ export class TakeQuiz implements OnInit, OnDestroy {
         this.submitted = true;
         if (res.success && res.data) {
           this.result = res.data;
+          this.showAnswerReview = true;
+          this.reviewCountdown = 5;
           this.cdr.detectChanges();
-          setTimeout(() => { this.showResult = true; this.cdr.detectChanges(); }, 1800);
+          // Countdown then show result card
+          const countInterval = setInterval(() => {
+            this.reviewCountdown--;
+            this.cdr.detectChanges();
+            if (this.reviewCountdown <= 0) {
+              clearInterval(countInterval);
+              this.showAnswerReview = false;
+              this.showResult = true;
+              this.cdr.detectChanges();
+            }
+          }, 1000);
         } else {
           this.toast.error(res.message || 'Submission failed.');
           this.cdr.detectChanges();

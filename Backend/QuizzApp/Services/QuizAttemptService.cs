@@ -254,7 +254,6 @@ namespace QuizzApp.Services
 
         public async Task<IEnumerable<QuizResultDTO>> GetUserResultsAsync(int userId)
         {
-            // Get quiz IDs that belong to group quizzes for this user — exclude from individual results
             var groupQuizIds = await _context.GroupQuizResults
                 .Include(gr => gr.GroupQuiz)
                 .Where(gr => gr.UserId == userId)
@@ -279,6 +278,81 @@ namespace QuizzApp.Services
                 CompletedAt = r.CompletedAt,
                 AnswerBreakdown = new List<AnswerResultDTO>()
             });
+        }
+
+        public async Task<QuizResultDTO?> GetResultByQuizAsync(int quizId, int userId)
+        {
+            var result = await _context.QuizResults
+                .Include(r => r.Quiz)
+                .FirstOrDefaultAsync(r => r.UserId == userId && r.QuizId == quizId);
+
+            if (result == null) return null;
+
+            // Load user answers for this quiz
+            var userAnswers = await _context.UserAnswers
+                .Where(a => a.UserId == userId && a.QuizId == quizId)
+                .ToListAsync();
+
+            // Load questions with options
+            var questions = await _context.Questions
+                .Include(q => q.Options)
+                .Where(q => q.QuizId == quizId)
+                .ToListAsync();
+
+            var breakdown = new List<AnswerResultDTO>();
+
+            foreach (var question in questions)
+            {
+                var selectedIds = userAnswers
+                    .Where(a => a.QuestionId == question.Id)
+                    .Select(a => a.SelectedOptionId)
+                    .ToList();
+
+                var correctOptions = question.Options.Where(o => o.IsCorrect).ToList();
+                var bd = new AnswerResultDTO
+                {
+                    QuestionId = question.Id,
+                    QuestionText = question.QuestionText,
+                    QuestionType = question.QuestionType
+                };
+
+                if (question.QuestionType == "MultipleAnswer")
+                {
+                    var correctIds = correctOptions.Select(o => o.Id).ToHashSet();
+                    bd.SelectedOptionIds = selectedIds;
+                    bd.SelectedOptionTexts = selectedIds
+                        .Select(id => question.Options.FirstOrDefault(o => o.Id == id)?.OptionText ?? "")
+                        .ToList();
+                    bd.CorrectOptionIds = correctIds.ToList();
+                    bd.CorrectOptionTexts = correctOptions.Select(o => o.OptionText).ToList();
+                    bd.IsCorrect = correctIds.SetEquals(selectedIds.ToHashSet());
+                }
+                else
+                {
+                    var selectedId = selectedIds.FirstOrDefault();
+                    var correctOption = correctOptions.FirstOrDefault();
+                    var selectedOption = question.Options.FirstOrDefault(o => o.Id == selectedId);
+                    bd.SelectedOptionId = selectedId;
+                    bd.SelectedOptionText = selectedOption?.OptionText ?? "Not answered";
+                    bd.CorrectOptionId = correctOption?.Id ?? 0;
+                    bd.CorrectOptionText = correctOption?.OptionText ?? "";
+                    bd.IsCorrect = selectedId != 0 && selectedId == correctOption?.Id;
+                }
+
+                breakdown.Add(bd);
+            }
+
+            return new QuizResultDTO
+            {
+                ResultId = result.Id,
+                QuizId = result.QuizId,
+                QuizTitle = result.Quiz?.Title ?? "",
+                Score = result.Score,
+                TotalQuestions = result.TotalQuestions,
+                Percentage = result.Percentage,
+                CompletedAt = result.CompletedAt,
+                AnswerBreakdown = breakdown
+            };
         }
     }
 }
