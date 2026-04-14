@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuizzApp.Context;
 
@@ -11,9 +12,11 @@ using QuizzApp.Context;
 namespace QuizzApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class DbContext : ModelSnapshot
+    [Migration("20260413060201_AddCategoryCreatedBy")]
+    partial class AddCategoryCreatedBy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -16,7 +16,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // Admin routes — removed (not required)
 
   // Creator routes
   {

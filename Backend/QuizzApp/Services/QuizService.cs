@@ -163,7 +163,9 @@ namespace QuizzApp.Services
             if (categoryId.HasValue)
                 query = query.Where(q => q.CategoryId == categoryId.Value);
 
-            var quizzes = await query.ToListAsync();
+            var quizzes = await query
+                .OrderByDescending(q => q.CreatedAt)
+                .ToListAsync();
 
             return quizzes.Select(q => new QuizDTO
             {

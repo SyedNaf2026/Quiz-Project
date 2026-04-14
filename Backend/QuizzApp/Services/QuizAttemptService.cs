@@ -50,6 +50,22 @@ namespace QuizzApp.Services
             if (hasAttempted && userRole == "QuizTaker")
                 return (false, "You have already attempted this quiz. Upgrade to Premium for unlimited attempts.", null);
 
+            // PremiumTaker — enforce 24-hour cooldown between retakes
+            if (hasAttempted && userRole == "PremiumTaker")
+            {
+                var lastAttempt = await _context.QuizResults
+                    .Where(r => r.UserId == userId && r.QuizId == dto.QuizId)
+                    .OrderByDescending(r => r.CompletedAt)
+                    .FirstAsync();
+
+                var hoursSince = (DateTime.UtcNow - lastAttempt.CompletedAt).TotalHours;
+                if (hoursSince < 24)
+                {
+                    var hoursLeft = (int)Math.Ceiling(24 - hoursSince);
+                    return (false, $"You can retake this quiz after {hoursLeft} more hour(s). Come back later!", null);
+                }
+            }
+
             // Delete previous attempt so user can retake
             var existingAttempt = await _resultRepo.FindAsync(r => r.UserId == userId && r.QuizId == dto.QuizId);
             if (existingAttempt.Any())

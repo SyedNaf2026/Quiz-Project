@@ -17,22 +17,18 @@ namespace QuizzApp.Services
             _context = context;
         }
 
-        public async Task<CategoryDTO> CreateCategoryAsync(CreateCategoryDTO dto)
+        public async Task<CategoryDTO> CreateCategoryAsync(CreateCategoryDTO dto, int createdBy)
         {
             var category = new Category
             {
                 Name = dto.Name,
-                Description = dto.Description
+                Description = dto.Description,
+                CreatedBy = createdBy
             };
 
             await _categoryRepo.AddAsync(category);
 
-            return new CategoryDTO
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description
-            };
+            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description };
         }
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
@@ -46,32 +42,32 @@ namespace QuizzApp.Services
             });
         }
 
-        public async Task<(bool Success, string Message, CategoryDTO? Data)> UpdateCategoryAsync(int id, CreateCategoryDTO dto)
+        public async Task<(bool Success, string Message, CategoryDTO? Data)> UpdateCategoryAsync(int id, CreateCategoryDTO dto, int userId)
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null) return (false, "Category not found.", null);
+            if (string.IsNullOrWhiteSpace(dto.Name)) return (false, "Category name is required.", null);
 
-            if (string.IsNullOrWhiteSpace(dto.Name))
-                return (false, "Category name is required.", null);
+            // Only the creator can edit — unless it has no owner (legacy category)
+            if (category.CreatedBy.HasValue && category.CreatedBy != userId)
+                return (false, "You can only edit your own categories.", null);
 
             category.Name = dto.Name;
             category.Description = dto.Description;
             await _categoryRepo.UpdateAsync(category);
 
-            return (true, "Category updated.", new CategoryDTO
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description
-            });
+            return (true, "Category updated.", new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description });
         }
 
-        public async Task<(bool Success, string Message)> DeleteCategoryAsync(int id)
+        public async Task<(bool Success, string Message)> DeleteCategoryAsync(int id, int userId)
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null) return (false, "Category not found.");
 
-            // Check if any quizzes are using this category
+            // Only the creator can delete — unless it has no owner (legacy category)
+            if (category.CreatedBy.HasValue && category.CreatedBy != userId)
+                return (false, "You can only delete your own categories.");
+
             var inUse = await _context.Quizzes.AnyAsync(q => q.CategoryId == id);
             if (inUse) return (false, "Cannot delete — this category is used by one or more quizzes.");
 

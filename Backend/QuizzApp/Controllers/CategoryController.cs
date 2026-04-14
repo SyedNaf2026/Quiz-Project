@@ -1,12 +1,11 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuizzApp.DTOs;
 using QuizzApp.Interfaces;
-using QuizzApp.Services;
 
 namespace QuizzApp.Controllers
 {
-    // CategoryController handles quiz categories
     [ApiController]
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
@@ -18,8 +17,13 @@ namespace QuizzApp.Controllers
             _categoryService = categoryService;
         }
 
-        // GET api/category
-        // View all categories (public - anyone can browse)
+        private int GetUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(claim, out int id) ? id : 0;
+        }
+
+        // GET api/category — public
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -28,31 +32,33 @@ namespace QuizzApp.Controllers
         }
 
         // POST api/category
-        // Create a new category (QuizCreator only)
         [HttpPost]
-       // [Authorize(Roles = "QuizCreator")]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateCategoryDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return BadRequest(ApiResponse<CategoryDTO>.Fail("Category name is required."));
 
-            var result = await _categoryService.CreateCategoryAsync(dto);
+            var result = await _categoryService.CreateCategoryAsync(dto, GetUserId());
             return Ok(ApiResponse<CategoryDTO>.Ok(result, "Category created successfully."));
         }
+
         // PUT api/category/{id}
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] CreateCategoryDTO dto)
         {
-            var (success, message, data) = await _categoryService.UpdateCategoryAsync(id, dto);
+            var (success, message, data) = await _categoryService.UpdateCategoryAsync(id, dto, GetUserId());
             if (!success) return BadRequest(ApiResponse<CategoryDTO>.Fail(message));
             return Ok(ApiResponse<CategoryDTO>.Ok(data!, message));
         }
 
         // DELETE api/category/{id}
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
-            var (success, message) = await _categoryService.DeleteCategoryAsync(id);
+            var (success, message) = await _categoryService.DeleteCategoryAsync(id, GetUserId());
             if (!success) return BadRequest(ApiResponse<string>.Fail(message));
             return Ok(ApiResponse<string>.Ok(message));
         }

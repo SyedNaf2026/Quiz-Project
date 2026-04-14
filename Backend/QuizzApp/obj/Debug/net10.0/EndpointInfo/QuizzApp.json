@@ -140,6 +140,18 @@
         }
       }
     },
+    "/api/Category/mine": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Category/{id}": {
       "put": {
         "tags": [

@@ -46,7 +46,7 @@ namespace QuizzApp.Services
         public async Task SendToAllTakersAsync(string message, string type)
         {
             var takerIds = await _context.Users
-                .Where(u => u.Role == "QuizTaker")
+                .Where(u => u.Role == "QuizTaker" || u.Role == "PremiumTaker")
                 .Select(u => u.Id)
                 .ToListAsync();
 

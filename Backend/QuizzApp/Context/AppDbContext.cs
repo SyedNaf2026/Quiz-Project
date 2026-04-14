@@ -44,6 +44,12 @@ namespace QuizzApp.Context
             {
                 entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
                 entity.Property(c => c.Description).HasMaxLength(500);
+
+                entity.HasOne(c => c.Creator)
+                    .WithMany()
+                    .HasForeignKey(c => c.CreatedBy)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired(false);
             });
 
             modelBuilder.Entity<Quiz>(entity =>
