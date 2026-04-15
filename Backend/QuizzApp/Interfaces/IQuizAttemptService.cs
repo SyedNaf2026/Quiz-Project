@@ -7,5 +7,6 @@ namespace QuizzApp.Interfaces
         Task<(bool Success, string Message, QuizResultDTO? Data)> SubmitQuizAsync(SubmitQuizDTO dto, int userId);
         Task<IEnumerable<QuizResultDTO>> GetUserResultsAsync(int userId);
         Task<QuizResultDTO?> GetResultByQuizAsync(int quizId, int userId);
+        Task<IEnumerable<QuizAttemptStatusDTO>> GetUserAttemptStatusAsync(int userId, string role);
     }
 }

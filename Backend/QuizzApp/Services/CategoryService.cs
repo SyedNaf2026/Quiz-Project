@@ -28,7 +28,7 @@ namespace QuizzApp.Services
 
             await _categoryRepo.AddAsync(category);
 
-            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description };
+            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description, CreatedBy = category.CreatedBy };
         }
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
@@ -38,7 +38,8 @@ namespace QuizzApp.Services
             {
                 Id = c.Id,
                 Name = c.Name,
-                Description = c.Description
+                Description = c.Description,
+                CreatedBy = c.CreatedBy
             });
         }
 

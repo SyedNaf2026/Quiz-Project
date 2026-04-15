@@ -370,5 +370,41 @@ namespace QuizzApp.Services
                 AnswerBreakdown = breakdown
             };
         }
+        public async Task<IEnumerable<QuizAttemptStatusDTO>> GetUserAttemptStatusAsync(int userId, string role)
+        {
+            var results = await _context.QuizResults
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.CompletedAt)
+                .ToListAsync();
+
+            var statusList = new List<QuizAttemptStatusDTO>();
+
+            foreach (var group in results.GroupBy(r => r.QuizId))
+            {
+                var last = group.First();
+                var hoursSince = (DateTime.UtcNow - last.CompletedAt).TotalHours;
+
+                if (role == "PremiumTaker" && hoursSince < 24)
+                {
+                    statusList.Add(new QuizAttemptStatusDTO
+                    {
+                        QuizId = group.Key,
+                        Status = "cooldown",
+                        HoursRemaining = (int)Math.Ceiling(24 - hoursSince)
+                    });
+                }
+                else if (role == "QuizTaker")
+                {
+                    statusList.Add(new QuizAttemptStatusDTO
+                    {
+                        QuizId = group.Key,
+                        Status = "attempted",
+                        HoursRemaining = 0
+                    });
+                }
+            }
+
+            return statusList;
+        }
     }
 }

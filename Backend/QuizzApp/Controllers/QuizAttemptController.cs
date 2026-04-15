@@ -40,8 +40,17 @@ namespace QuizzApp.Controllers
             return Ok(ApiResponse<IEnumerable<QuizResultDTO>>.Ok(results));
         }
 
-        // GET api/quizattempt/review/{quizId}
-        // Returns full result with answer breakdown for review
+        // GET api/quizattempt/attempt-status
+        // Returns attempted quiz IDs with cooldown info for PremiumTaker
+        [HttpGet("attempt-status")]
+        public async Task<IActionResult> GetAttemptStatus()
+        {
+            var userId = GetUserId();
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+
+            var results = await _attemptService.GetUserAttemptStatusAsync(userId, role);
+            return Ok(ApiResponse<IEnumerable<QuizAttemptStatusDTO>>.Ok(results));
+        }
         [HttpGet("review/{quizId}")]
         public async Task<IActionResult> ReviewResult(int quizId)
         {

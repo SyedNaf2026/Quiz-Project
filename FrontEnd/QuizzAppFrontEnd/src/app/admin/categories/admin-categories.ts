@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { Navbar } from '../../navbar/navbar';
 import { CategoryService } from '../../service/category.service';
+import { UserService } from '../../service/user.service';
 import { ToastService } from '../../service/toast.service';
 import { CategoryDTO } from '../../models/models';
 
@@ -25,9 +26,11 @@ export class AdminCategories implements OnInit {
   editName = '';
   editDescription = '';
   editSaving = false;
+  currentUserId = 0;
 
   constructor(
     private categoryService: CategoryService,
+    private userService: UserService,
     private toast: ToastService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
@@ -38,7 +41,18 @@ export class AdminCategories implements OnInit {
     });
   }
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.userService.getProfile().subscribe({
+      next: res => { this.currentUserId = res.data?.id ?? 0; }
+    });
+    this.load();
+  }
+
+  isOwner(cat: CategoryDTO): boolean {
+    // null/undefined createdBy = legacy category — allow any creator to edit
+    if (cat.createdBy == null) return true;
+    return cat.createdBy === this.currentUserId;
+  }
 
   load(): void {
     this.loading = true;
@@ -112,7 +126,12 @@ export class AdminCategories implements OnInit {
         }
         this.cdr.detectChanges();
       },
-      error: () => { this.editSaving = false; this.toast.error('Update failed.'); }
+      error: err => {
+        this.editSaving = false;
+        const msg = err?.error?.message || 'You can only edit your own categories.';
+        this.toast.error(msg);
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -123,7 +142,10 @@ export class AdminCategories implements OnInit {
         if (res.success) { this.toast.success('Category deleted.'); this.load(); }
         else this.toast.error(res.message);
       },
-      error: () => this.toast.error('Cannot delete — this category is in use by quizzes.')
+      error: (err) => {
+        const msg = err?.error?.message || 'You can only delete your own categories.';
+        this.toast.error(msg);
+      }
     });
   }
 }

@@ -7,7 +7,7 @@ import { CategoryService } from '../../service/category.service';
 import { GroupService } from '../../service/group.service';
 import { QuizAttemptService } from '../../service/quiz-attempt.service';
 import { ToastService } from '../../service/toast.service';
-import { CategoryDTO, QuizDTO, GroupQuizDTO } from '../../models/models';
+import { CategoryDTO, QuizDTO, GroupQuizDTO, QuizAttemptStatusDTO } from '../../models/models';
 
 @Component({
   selector: 'app-browse-quizzes',
@@ -24,6 +24,7 @@ export class BrowseQuizzes implements OnInit {
   groupQuizzes: GroupQuizDTO[] = [];
   completedGroupQuizIds: number[] = [];
   attemptedQuizIds: number[] = [];
+  attemptStatusMap = new Map<number, QuizAttemptStatusDTO>();
   role = localStorage.getItem('user-role') || '';
 
   loading = true;
@@ -75,11 +76,16 @@ export class BrowseQuizzes implements OnInit {
       error: () => {}
     });
 
-    // Load attempted quiz IDs for normal QuizTaker (to show Already Attempted)
-    if (this.role === 'QuizTaker') {
-      this.attemptService.getMyResults().subscribe({
+    // Load attempt status for QuizTaker and PremiumTaker
+    if (this.role === 'QuizTaker' || this.role === 'PremiumTaker') {
+      this.attemptService.getAttemptStatus().subscribe({
         next: res => {
-          this.attemptedQuizIds = (res.data || []).map(r => r.quizId);
+          this.attemptStatusMap.clear();
+          (res.data || []).forEach(s => this.attemptStatusMap.set(s.quizId, s));
+          // Also populate attemptedQuizIds for QuizTaker
+          if (this.role === 'QuizTaker') {
+            this.attemptedQuizIds = (res.data || []).map(s => s.quizId);
+          }
           this.cdr.detectChanges();
         },
         error: () => {}
@@ -166,5 +172,9 @@ export class BrowseQuizzes implements OnInit {
 
   isAlreadyAttempted(quizId: number): boolean {
     return this.role === 'QuizTaker' && this.attemptedQuizIds.includes(quizId);
+  }
+
+  getAttemptStatus(quizId: number): QuizAttemptStatusDTO | undefined {
+    return this.attemptStatusMap.get(quizId);
   }
 }

@@ -98,6 +98,10 @@
               @if (isAlreadyAttempted(quiz.id)) {
                 <span class="badge badge-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem" title="Upgrade to Premium for unlimited attempts">🔒 Already Attempted</span>
                 <a routerLink="/profile" class="btn btn-warning btn-sm">⭐ Go Premium</a>
+              } @else if (getAttemptStatus(quiz.id)?.status === 'cooldown') {
+                <span class="badge badge-warning" style="padding:0.4rem 0.8rem;font-size:0.8rem">
+                  ⏳ Cooldown — {{ getAttemptStatus(quiz.id)?.hoursRemaining }}h left
+                </span>
               } @else {
                 <a [routerLink]="['/taker/take', quiz.id]" class="btn btn-primary btn-sm">Start Quiz</a>
               }

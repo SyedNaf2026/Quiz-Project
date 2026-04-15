@@ -76,10 +76,14 @@
                     <td><strong>{{ cat.name }}</strong></td>
                     <td class="text-muted">{{ cat.description || '—' }}</td>
                     <td>
-                      <div class="d-flex gap-1">
-                        <button class="btn btn-sm btn-warning" (click)="startEdit(cat)">Edit</button>
-                        <button class="btn btn-sm btn-danger" (click)="deleteCategory(cat)">Delete</button>
-                      </div>
+                      @if (isOwner(cat)) {
+                        <div class="d-flex gap-1">
+                          <button class="btn btn-sm btn-warning" (click)="startEdit(cat)">Edit</button>
+                          <button class="btn btn-sm btn-danger" (click)="deleteCategory(cat)">Delete</button>
+                        </div>
+                      } @else {
+                        <span class="text-muted" style="font-size:0.8rem">—</span>
+                      }
                     </td>
                   }
                 </tr>

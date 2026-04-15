@@ -19,6 +19,11 @@ export class MyQuizzes implements OnInit {
   showConfirm = false;
   selectedQuiz: QuizDTO | null = null;
 
+  // Stats
+  statsMap = new Map<number, any>();
+  loadingStatsId: number | null = null;
+  openStatsId: number | null = null;
+
   constructor(
     private quizService: QuizService,
     private toast: ToastService,
@@ -66,6 +71,30 @@ export class MyQuizzes implements OnInit {
         this.load();
       },
       error: () => setTimeout(() => this.toast.error('Failed to delete quiz.'), 0)
+    });
+  }
+
+  toggleStats(quiz: QuizDTO): void {
+    if (this.openStatsId === quiz.id) {
+      this.openStatsId = null;
+      return;
+    }
+    this.openStatsId = quiz.id;
+    if (this.statsMap.has(quiz.id)) { this.cdr.detectChanges(); return; }
+
+    this.loadingStatsId = quiz.id;
+    this.cdr.detectChanges();
+    this.quizService.getStats(quiz.id).subscribe({
+      next: res => {
+        this.statsMap.set(quiz.id, res.data);
+        this.loadingStatsId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingStatsId = null;
+        this.toast.error('Failed to load stats.');
+        this.cdr.detectChanges();
+      }
     });
   }
 }

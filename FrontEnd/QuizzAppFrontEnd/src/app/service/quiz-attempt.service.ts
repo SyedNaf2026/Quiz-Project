@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse, QuizResultDTO, SubmitQuizDTO } from '../models/models';
+import { ApiResponse, QuizAttemptStatusDTO, QuizResultDTO, SubmitQuizDTO } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class QuizAttemptService {
@@ -15,6 +15,10 @@ export class QuizAttemptService {
 
   getMyResults(): Observable<ApiResponse<QuizResultDTO[]>> {
     return this.http.get<ApiResponse<QuizResultDTO[]>>(`${this.baseUrl}/my-results`);
+  }
+
+  getAttemptStatus(): Observable<ApiResponse<QuizAttemptStatusDTO[]>> {
+    return this.http.get<ApiResponse<QuizAttemptStatusDTO[]>>(`${this.baseUrl}/attempt-status`);
   }
 
   reviewResult(quizId: number): Observable<ApiResponse<QuizResultDTO>> {

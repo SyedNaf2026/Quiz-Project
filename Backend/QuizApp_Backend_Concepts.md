@@ -492,3 +492,469 @@ If less than 24 hours have passed, the submission is blocked with a clear messag
 **Where:** `QuizAttemptService.SubmitQuizAsync()` — checked before processing answers. No model change, no migration needed — `CompletedAt` already existed.
 
 **Frontend:** No change needed — the error message from the backend automatically shows as a toast notification via the existing error handler.
+
+---
+
+### Category Ownership — Who Can Edit/Delete
+
+**Operation:** Backend + Frontend
+
+**What:** Every category stores who created it (`CreatedBy` field). A QuizCreator can only edit or delete their own categories. Other creators' categories are visible but protected.
+
+**Why:** Without ownership, any QuizCreator could delete or rename another creator's category — breaking all quizzes that use it. Ownership ensures each creator is responsible only for what they created.
+
+**Backend:**
+- `Category` model — added `CreatedBy` (nullable int) and `Creator` navigation property
+- `AppDbContext` — configured relationship with `OnDelete(DeleteBehavior.SetNull)` so if a creator is deleted, the category remains but loses its owner
+- `CategoryService.CreateCategoryAsync(dto, createdBy)` — saves the creator's userId
+- `CategoryService.UpdateCategoryAsync(id, dto, userId)` — checks `category.CreatedBy != userId` → returns "You can only edit your own categories."
+- `CategoryService.DeleteCategoryAsync(id, userId)` — same ownership check + checks if any quiz uses it
+- `CategoryDTO` — includes `CreatedBy` field so frontend knows who owns each category
+- Migration: `AddCategoryCreatedBy`
+
+**Frontend:**
+- `CategoryDTO` interface — added `createdBy?: number`
+- `admin-categories.ts` — loads current user's profile on init to get `currentUserId`. `isOwner(cat)` method checks `cat.createdBy === currentUserId`
+- `admin-categories.html` — Edit/Delete buttons only render when `isOwner(cat)` is true. Other creators' categories show `—` in the Actions column
+- Error handlers read `err?.error?.message` to show the exact backend message as a toast
+
+---
+
+### Quiz Attempt Status on Browse Page (Cooldown Visibility)
+
+**Operation:** Backend + Frontend
+
+**What:** Before a user even clicks a quiz, the Browse Quizzes page shows their attempt status — "🔒 Already Attempted" for QuizTakers, "⏳ Cooldown — Xh left" for PremiumTakers in cooldown.
+
+**Why:** Previously users had to go through the entire quiz, answer all questions, and only find out at submission time that they couldn't submit. This wasted their time. Showing the status upfront on the browse card is a much better user experience.
+
+**Backend:**
+- New DTO `QuizAttemptStatusDTO { QuizId, Status, HoursRemaining }`
+- `IQuizAttemptService` — added `GetUserAttemptStatusAsync(userId, role)`
+- `QuizAttemptService.GetUserAttemptStatusAsync` — queries all `QuizResults` for the user, groups by `QuizId`, checks the latest `CompletedAt`. For `QuizTaker` → status `"attempted"`. For `PremiumTaker` within 24 hours → status `"cooldown"` with hours remaining
+- `QuizAttemptController` — new `GET /api/quizattempt/attempt-status` endpoint
+
+**Frontend:**
+- `QuizAttemptStatusDTO` interface added to `models.ts`
+- `quiz-attempt.service.ts` — added `getAttemptStatus()` calling the new endpoint
+- `browse-quizzes.ts` — loads attempt status on init for both `QuizTaker` and `PremiumTaker`. Stores in `Map<quizId, status>`. `getAttemptStatus(quizId)` helper method
+- `browse-quizzes.html` — three states on each quiz card:
+  - QuizTaker who attempted → 🔒 Already Attempted + ⭐ Go Premium button
+  - PremiumTaker in cooldown → ⏳ Cooldown — Xh left badge
+  - Available → Start Quiz button
+
+---
+
+### Quiz Delete — Cascade Cleanup
+
+**Operation:** Backend
+
+**What:** When a quiz is deleted, all dependent data is removed first in the correct order before the quiz itself is deleted.
+
+**Why:** SQL Server enforces foreign key constraints with `OnDelete(DeleteBehavior.Restrict)`. Deleting a quiz directly would throw `DbUpdateException` because other tables still reference it. The cleanup must happen in the right order — child records before parent records.
+
+**Order of deletion in `QuizService.DeleteQuizAsync`:**
+1. `GroupQuizResults` — submissions by group members (references GroupQuizzes)
+2. `GroupQuizzes` — group assignments (references Quiz)
+3. `QuizResults` — individual attempt results (references Quiz)
+4. `UserAnswers` — individual answers (references Quiz)
+5. Quiz deleted — now safe
+6. Questions + Options — cascade automatically (configured with `OnDelete(DeleteBehavior.Cascade)`)
+
+---
+
+### Newest Quiz Appears First
+
+**Operation:** Backend
+
+**What:** Browse Quizzes always shows the most recently created quiz at the top.
+
+**Why:** When a QuizCreator publishes a new quiz, it should be immediately visible at the top of the list — not buried after hundreds of older quizzes. Users naturally expect newest content first.
+
+**Where:** `QuizService.GetActiveQuizzesAsync()` — added `.OrderByDescending(q => q.CreatedAt)` to the LINQ query.
+
+---
+
+### PremiumTaker Notifications
+
+**Operation:** Backend
+
+**What:** PremiumTakers receive the same in-app notifications as QuizTakers — new quiz added, quiz updated, quiz deactivated, leaderboard changes.
+
+**Why:** When a user upgrades to PremiumTaker, their role changes from `QuizTaker` to `PremiumTaker`. The original `SendToAllTakersAsync` only queried `Role == "QuizTaker"` — so PremiumTakers were silently excluded from all notifications after upgrading.
+
+**Fix:** `NotificationService.SendToAllTakersAsync` — changed the query to:
+```csharp
+.Where(u => u.Role == "QuizTaker" || u.Role == "PremiumTaker")
+```
+
+---
+
+# Deep Dive — Key Features for Evaluation
+
+---
+
+## SignalR — Real-Time Notification System
+
+### What is SignalR?
+
+SignalR is a library that enables **real-time two-way communication** between the server and the browser. Instead of the browser asking the server "any new data?" every few seconds (polling), SignalR keeps a persistent connection open. When something happens on the server, it **pushes** the data to the browser instantly — like WhatsApp messages.
+
+Under the hood, SignalR uses **WebSockets** (and falls back to long-polling if WebSockets aren't available).
+
+---
+
+### Why did we use SignalR instead of polling?
+
+| Polling | SignalR |
+|---------|---------|
+| Browser asks server every X seconds | Server pushes when something happens |
+| Wastes bandwidth even when nothing changed | Only sends data when needed |
+| Delay between event and notification | Instant — milliseconds |
+| Simple to implement | Slightly more setup but much better UX |
+
+In a quiz app, when a new quiz is created, you want QuizTakers to know **immediately** — not after 30 seconds of polling.
+
+---
+
+### How it works in your project — Step by Step
+
+**Step 1 — Backend Hub**
+
+`NotificationHub.cs` is the SignalR hub — the central connection point:
+
+```csharp
+public class NotificationHub : Hub
+{
+    public async Task JoinUserGroup(string userId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+    }
+}
+```
+
+When a user connects, they call `JoinUserGroup("5")`. SignalR adds their connection to a group called `user_5`. Now you can send messages to just that user by targeting `user_5`.
+
+**Step 2 — Registered in Program.cs**
+
+```csharp
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+app.MapHub<NotificationHub>("/hubs/notifications");
+```
+
+CORS must allow credentials for SignalR:
+```csharp
+policy.AllowCredentials();
+```
+
+**Step 3 — NotificationService sends messages**
+
+```csharp
+// Send to one specific user
+await _hub.Clients.Group($"user_{userId}")
+    .SendAsync("ReceiveNotification", notificationDTO);
+
+// Send to all QuizTakers and PremiumTakers
+foreach (var userId in takerIds)
+{
+    await _hub.Clients.Group($"user_{userId}")
+        .SendAsync("ReceiveNotification", notificationDTO);
+}
+```
+
+Every notification is also **saved to the database** so users see them even after re-login.
+
+**Step 4 — Frontend connects**
+
+`notification.service.ts`:
+
+```typescript
+this.hubConnection = new signalR.HubConnectionBuilder()
+    .withUrl('https://localhost:7220/hubs/notifications', {
+        accessTokenFactory: () => this.auth.getToken() ?? ''
+    })
+    .withAutomaticReconnect()
+    .build();
+
+this.hubConnection.on('ReceiveNotification', (notification) => {
+    // Add to the BehaviorSubject — navbar updates instantly
+    this.notifications$.next([notification, ...current]);
+    this.showPopup(notification); // show popup card
+});
+
+this.hubConnection.start()
+    .then(() => this.hubConnection.invoke('JoinUserGroup', userId.toString()));
+```
+
+**Step 5 — Navbar subscribes**
+
+```typescript
+this.notifSub = this.notifService.notifications$.subscribe(n => {
+    this.notifications = n; // bell badge count updates automatically
+});
+```
+
+`BehaviorSubject` is an RxJS observable that holds the current value and emits to all subscribers whenever it changes.
+
+---
+
+### What triggers a notification in your project?
+
+| Event | Who gets notified | Type |
+|-------|------------------|------|
+| Quiz created | All QuizTakers + PremiumTakers | `quiz_added` |
+| Quiz updated | All QuizTakers + PremiumTakers | `quiz_updated` |
+| Quiz deactivated | All QuizTakers + PremiumTakers | `quiz_deactivated` |
+| Quiz assigned to group | All group members | `group_quiz_assigned` |
+| Group member submits quiz | GroupManager | `group_submission` |
+| Leaderboard #1 changes | All QuizTakers + PremiumTakers | `leaderboard_update` |
+| Displaced from #1 | Previous #1 user only | `rank_lost` |
+
+---
+
+### On Login — Unread Notifications Popup
+
+When a user logs in, `connect(userId)` is called from the navbar after fetching the profile. It:
+1. Starts the SignalR connection
+2. Calls `loadNotifications(showUnreadPopups: true)`
+3. Fetches all notifications from `GET /api/notification`
+4. Shows up to 3 unread ones as popup cards in the top-right corner
+5. Each popup has a redirect — clicking it navigates to the relevant page
+
+---
+
+### Notification Persistence
+
+Every notification is stored in the `Notifications` table:
+
+```
+Id | UserId | Message | Type | IsRead | CreatedAt
+```
+
+This means even if the user is offline when the notification is sent, they see it when they log in next time. The REST endpoint `GET /api/notification` loads their history. `PUT /api/notification/{id}/read` marks one as read. `PUT /api/notification/read-all` marks all.
+
+---
+
+## Group Manager Feature — End to End Flow
+
+### What is the Group Manager role?
+
+A GroupManager is a role that manages a team of QuizTakers. They create groups, add members, assign quizzes, and review/validate submissions. Think of it like a teacher managing a class.
+
+---
+
+### Complete Flow — Step by Step
+
+**Step 1 — Register as GroupManager**
+
+On the Register page, select "Manage Groups" from the role dropdown. This creates a user with `Role = "GroupManager"` in the database.
+
+**Step 2 — Create a Group**
+
+GroupManager logs in → goes to "My Groups" → clicks "+ New Group" → fills in name and description → submits.
+
+Backend: `POST /api/group` → `GroupService.CreateGroupAsync(dto, managerId)` → saves `Group { Name, Description, CreatedBy = managerId }` to DB.
+
+**Step 3 — Add Members**
+
+In the group detail page → Members tab → type a name or email in the search box.
+
+Backend: `GET /api/group/search-users?query=syed` → `GroupService.SearchUsersAsync` → queries `Users` where `Role == "QuizTaker"` and name/email contains the query → returns matching users.
+
+Click "Add" → `POST /api/group/{id}/members/{userId}` → saves `GroupMember { GroupId, UserId }`.
+
+**Step 4 — Assign a Quiz**
+
+Quizzes tab → shows all active quizzes → click "Assign" on any quiz.
+
+Backend: `POST /api/group/{id}/quizzes/{quizId}` → `GroupService.AssignQuizAsync` → saves `GroupQuiz { GroupId, QuizId, RequiresValidation = false }` → **notifies all group members** via SignalR with `group_quiz_assigned`.
+
+**Step 5 — Create a Quiz for the Group**
+
+"Create Quiz" tab → fill in title, category, difficulty → click "Create & Assign to Group".
+
+Backend: `POST /api/quiz` → quiz created → `POST /api/group/{id}/quizzes/{quizId}` → quiz assigned → `PUT /api/group/{id}/quizzes/{quizId}/require-validation` → sets `RequiresValidation = true` → navigates to questions page.
+
+**Key difference:** Assigned existing quiz → `RequiresValidation = false` (auto). Created by GM → `RequiresValidation = true` (needs approval).
+
+**Step 6 — Member Takes the Quiz**
+
+QuizTaker logs in → Browse Quizzes → sees "👥 Assigned to You by Group" section at top → group quizzes are **hidden from the general list** to avoid confusion → clicks "Start Quiz" → completes it → submits.
+
+Backend on submit: `QuizAttemptService` saves `QuizResult` → checks if this quiz belongs to a group the user is in → creates `GroupQuizResult { GroupQuizId, UserId, QuizResultId, ValidationStatus = "Pending" }` → **notifies the GroupManager** with score details.
+
+**Step 7 — GroupManager Reviews Submissions**
+
+Submissions tab → sees all member submissions with score and status.
+
+- If `RequiresValidation = false` → Action shows "Auto" — no review needed
+- If `RequiresValidation = true` → Action shows "Approve" / "Revoke" buttons
+
+Click "Approve" → `PUT /api/group/submissions/{resultId}/validate` → `ValidationStatus = "Approved"`.
+
+**Step 8 — QuizTaker sees their Group Results**
+
+My Results page → "👥 Group Results" tab → shows Group Name, Quiz Title, Score, Validation Status (Pending/Approved/N/A).
+
+---
+
+### Database Tables Involved
+
+```
+Groups          — group info + CreatedBy (GroupManager)
+GroupMembers    — which users are in which group
+GroupQuizzes    — which quizzes are assigned to which group + RequiresValidation
+GroupQuizResults — member submissions with ValidationStatus
+```
+
+---
+
+## Premium Upgrade — Complete Flow
+
+### What is PremiumTaker?
+
+A PremiumTaker is a QuizTaker who has paid to upgrade. They get **unlimited quiz attempts** with a **24-hour cooldown** between retakes on the same quiz. Normal QuizTakers get only one attempt per quiz.
+
+---
+
+### Complete Flow — Step by Step
+
+**Step 1 — User is a normal QuizTaker**
+
+Registered as QuizTaker. Takes a quiz. Sees "🔒 Already Attempted" on that quiz in Browse. Wants to retake.
+
+**Step 2 — Goes to Profile**
+
+Profile page shows:
+- Current Plan: 🆓 Free Plan
+- "Single attempt per quiz"
+- Button: "⭐ Upgrade to Premium — ₹499"
+
+**Step 3 — Payment Modal Opens**
+
+Clicks the button → payment modal appears with:
+- Plan summary (₹499)
+- Card Number field (auto-formats as `4242 4242 4242 4242`)
+- Expiry (MM/YY)
+- CVV
+- Name on Card
+
+**Step 4 — Validation**
+
+Frontend validates before calling the API:
+- Card number must be 16 digits
+- Expiry must match `MM/YY` pattern using `Validators.pattern`
+- CVV must be 3+ digits
+- Name must not be empty
+
+**Step 5 — Simulated Payment Processing**
+
+Click "Pay ₹499" → `paymentLoading = true` → `setTimeout(..., 2000)` → 2 second spinner → calls `PUT /api/user/upgrade-to-premium`.
+
+**Step 6 — Backend Upgrades the Role**
+
+`UserService.UpgradeToPremiumAsync(userId)`:
+1. Finds the user by ID
+2. Checks role is `QuizTaker` (not already premium)
+3. Changes `user.Role = "PremiumTaker"`
+4. Saves to DB via `_userRepo.UpdateAsync(user)`
+5. Generates a **new JWT token** with `PremiumTaker` role in the claims
+6. Returns `UpgradeResponseDTO { Token, Role, Message }`
+
+**Why a new JWT token?** The old token still says `QuizTaker` inside it. JWT tokens are self-contained — the role is embedded. The server can't change the token after issuing it. So a fresh token with the new role must be issued.
+
+**Step 7 — Frontend Saves New Token**
+
+```typescript
+localStorage.setItem('JWT-token', res.data.token);
+localStorage.setItem('user-role', res.data.role);
+```
+
+Then navigates to `/home` and back to `/profile` — this triggers the navbar's `NavigationEnd` listener which calls `loadUserInfo()` and picks up `PremiumTaker` from localStorage.
+
+**Step 8 — Navbar Updates**
+
+`isTaker()` returns true for both `QuizTaker` and `PremiumTaker` — so all taker nav links remain. Username shows ⭐ prefix. Profile shows "⭐ Premium Plan" badge.
+
+**Step 9 — Browse Quizzes Updates**
+
+`getAttemptStatus()` is called on init. For PremiumTaker:
+- If within 24 hours of last attempt → shows "⏳ Cooldown — Xh left"
+- If cooldown passed → shows "Start Quiz" — can retake
+
+**Step 10 — 24-Hour Cooldown on Retake**
+
+When PremiumTaker submits a quiz they've already taken:
+
+```csharp
+var hoursSince = (DateTime.UtcNow - lastAttempt.CompletedAt).TotalHours;
+if (hoursSince < 24)
+{
+    var hoursLeft = (int)Math.Ceiling(24 - hoursSince);
+    return (false, $"You can retake this quiz after {hoursLeft} more hour(s).", null);
+}
+```
+
+The `CompletedAt` timestamp already existed on `QuizResult` — no model change needed.
+
+---
+
+### Summary — QuizTaker vs PremiumTaker
+
+| Feature | QuizTaker | PremiumTaker |
+|---------|-----------|--------------|
+| Attempts per quiz | 1 | Unlimited (24h cooldown) |
+| Browse page status | 🔒 Already Attempted | ⏳ Cooldown or Start Quiz |
+| Leaderboard | First attempt counts | First attempt counts (planned) |
+| Notifications | ✅ Yes | ✅ Yes |
+| Group quizzes | ✅ Yes | ✅ Yes |
+| Upgrade option | ✅ Profile page | Already premium |
+| JWT role claim | `QuizTaker` | `PremiumTaker` |
+
+---
+
+## Quiz Analytics — Creator Stats
+
+**Operation:** Backend (existing) + Frontend (new UI)
+
+### What is it?
+
+A QuizCreator can view analytics for each of their quizzes directly on the "My Quizzes" page by clicking the "📊 Stats" button on any quiz card.
+
+### What data does it show?
+
+| Stat | Meaning |
+|------|---------|
+| Total Attempts | How many QuizTakers have submitted this quiz |
+| Avg Score | Average percentage across all submissions |
+| Highest | Best score anyone achieved |
+| Lowest | Worst score anyone achieved |
+
+### How it works — Step by Step
+
+**Backend — already existed:**
+
+`GET /api/quiz/{id}/stats` → `QuizService.GetQuizStatsAsync(quizId, creatorId)`:
+1. Verifies the quiz belongs to the logged-in creator — access denied if not
+2. Queries all `QuizResults` where `QuizId == quizId`
+3. Calculates `TotalAttempts`, `AverageScore`, `HighestScore`, `LowestScore`
+4. Returns as an anonymous object
+
+**Frontend — what was added:**
+
+`my-quizzes.ts`:
+- `statsMap = new Map<number, any>()` — stores loaded stats per quiz ID so they don't reload every time
+- `openStatsId` — tracks which quiz's stats panel is currently open
+- `loadingStatsId` — tracks which quiz is currently loading stats
+- `toggleStats(quiz)` — if already open, closes it. If not loaded yet, calls `quizService.getStats(quiz.id)` and stores result in `statsMap`. If already loaded, just opens the panel (no extra API call)
+
+`my-quizzes.html`:
+- "📊 Stats" button added to each quiz card
+- Inline stats panel renders below the card when open
+- Shows 4 stat boxes in a responsive grid — Total Attempts, Avg Score, Highest, Lowest
+- Each box has a color: blue for attempts, green for average, amber for highest, red for lowest
+
+### Why this approach (Map instead of array)?
+
+Using `Map<quizId, stats>` means once a quiz's stats are loaded, they're cached. If the creator opens and closes the panel multiple times, it only makes **one API call** — not one every time. This is efficient and avoids unnecessary network requests.

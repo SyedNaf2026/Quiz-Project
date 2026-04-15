@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Syed\\Quiz-Project\\Backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\services\\quizservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\services\\quizservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\models\\dto\\notificationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\models\\dto\\notificationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|c:\\syed\\quiz-project\\backend\\quizzapp\\models\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE2F2891-57C0-57FC-EEEC-F819E9C989A5}|QuizzApp\\QuizzApp.csproj|solutionrelative:quizzapp\\models\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,14 +39,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "QuizService.cs",
-              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Services\\QuizService.cs",
-              "RelativeDocumentMoniker": "QuizzApp\\Services\\QuizService.cs",
-              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Services\\QuizService.cs",
-              "RelativeToolTip": "QuizzApp\\Services\\QuizService.cs",
-              "ViewState": "AgIAAJMAAAAAAAAAAAAowJsAAAAJAAAAAAAAAA==",
+              "Title": "NotificationService.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Services\\NotificationService.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Services\\NotificationService.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Services\\NotificationService.cs",
+              "RelativeToolTip": "QuizzApp\\Services\\NotificationService.cs",
+              "ViewState": "AgIAAEwAAAAAAAAAAAAAAD0AAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-13T09:19:27.495Z",
+              "WhenOpened": "2026-04-15T00:33:05.04Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Notification.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Models\\Notification.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Models\\Notification.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Models\\Notification.cs",
+              "RelativeToolTip": "QuizzApp\\Models\\Notification.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T00:32:49.01Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NotificationDTOs.cs",
+              "DocumentMoniker": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Models\\DTO\\NotificationDTOs.cs",
+              "RelativeDocumentMoniker": "QuizzApp\\Models\\DTO\\NotificationDTOs.cs",
+              "ToolTip": "C:\\Syed\\Quiz-Project\\Backend\\QuizzApp\\Models\\DTO\\NotificationDTOs.cs",
+              "RelativeToolTip": "QuizzApp\\Models\\DTO\\NotificationDTOs.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:53:54.158Z",
               "EditorCaption": ""
             }
           ]

@@ -140,18 +140,6 @@
         }
       }
     },
-    "/api/Category/mine": {
-      "get": {
-        "tags": [
-          "Category"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Category/{id}": {
       "put": {
         "tags": [
@@ -1094,6 +1082,18 @@
       }
     },
     "/api/QuizAttempt/my-results": {
+      "get": {
+        "tags": [
+          "QuizAttempt"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/QuizAttempt/attempt-status": {
       "get": {
         "tags": [
           "QuizAttempt"

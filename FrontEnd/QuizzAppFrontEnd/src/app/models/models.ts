@@ -31,6 +31,7 @@ export interface CategoryDTO {
   id: number;
   name: string;
   description: string;
+  createdBy?: number;
 }
 
 export interface CreateCategoryDTO {
@@ -236,4 +237,11 @@ export interface UpgradeResponseDTO {
   token: string;
   role: string;
   message: string;
+}
+
+// ===== Quiz Attempt Status =====
+export interface QuizAttemptStatusDTO {
+  quizId: number;
+  status: string; // "attempted" | "cooldown"
+  hoursRemaining: number;
 }

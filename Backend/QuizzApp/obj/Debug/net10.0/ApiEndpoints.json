@@ -111,16 +111,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "QuizzApp.Controllers.CategoryController",
-    "Method": "GetMine",
-    "RelativePath": "api/Category/mine",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "QuizzApp.Controllers.GroupController",
     "Method": "Create",
     "RelativePath": "api/Group",
@@ -671,6 +661,16 @@
     "ContainingType": "QuizzApp.Controllers.QuizController",
     "Method": "GetMyQuizzes",
     "RelativePath": "api/Quiz/my-quizzes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QuizzApp.Controllers.QuizAttemptController",
+    "Method": "GetAttemptStatus",
+    "RelativePath": "api/QuizAttempt/attempt-status",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

@@ -53,3 +53,12 @@ namespace QuizzApp.DTOs
         public bool IsCorrect { get; set; }
     }
 }
+
+    public class QuizAttemptStatusDTO
+    {
+        public int QuizId { get; set; }
+        // "attempted" | "cooldown" 
+        public string Status { get; set; } = string.Empty;
+        // Hours remaining in cooldown (0 if not in cooldown)
+        public int HoursRemaining { get; set; }
+    }
